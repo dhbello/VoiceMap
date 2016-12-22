@@ -43,7 +43,7 @@ function onDeviceReady() {
 function init() {
     currentUser = window.localStorage.getItem("user");
     if (isPhoneGapExclusive()) {
-        login();
+        gotoLogin();
         try {
             var push = PushNotification.init({
                 android: {
@@ -75,16 +75,16 @@ function init() {
                 alert(JSON.stringify(e));
                 // e.message
             });
+
         } catch (err) {
-            alert("error:" + JSON.stringify(err));
+            alert(err);
         }
 
         if ((navigator.connection.type == 0) || (navigator.connection.type == 'none')) {
             sendAlert('Esta aplicaci&oacute;n requiere conexi&oacute;n a internet.');
             $("#bienvenida-toolbar").hide();
         }
-    } else {
-        gotoLogin();
+    } else {        
         if (window.localStorage.getItem("user") == null) {
             gotoLogin();
         } else {
@@ -203,9 +203,7 @@ function hideAll() {
 
 function login() {
     if (isPhoneGapExclusive()) {
-        window.plugins.googleplus.trySilentLogin({
-            'webClientId': "394219421908-hsc5q45ah24ppo7i2bhhga2cc1k3nncb.apps.googleusercontent.com"
-        },
+        window.plugins.googleplus.trySilentLogin({},
                 function (obj) {
                     alert(JSON.stringify(obj));
                     hideAll();
@@ -213,7 +211,20 @@ function login() {
                     updateUser();
                 },
                 function (msg) {
-                    alert("error: " + msg);
+                    window.plugins.googleplus.login({
+                        'webClientId': "394219421908-hsc5q45ah24ppo7i2bhhga2cc1k3nncb.apps.googleusercontent.com",
+                        offline: true
+                    },
+                    function (obj) {
+                        alert(JSON.stringify(obj));
+                        hideAll();
+                        gotoMap();
+                        updateUser();
+                    },
+                    function (msg) {
+                        alert("error: " + msg);
+                    }
+                 );
                 }
              );
     } else {
