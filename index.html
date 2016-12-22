@@ -1,0 +1,259 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <!--
+        Customize this policy to fit your own app's needs. For more guidance, see:
+            https://github.com/apache/cordova-plugin-whitelist/blob/master/README.md#content-security-policy
+        Some notes:
+            * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+            * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+            * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+                * Enable inline JS: add 'unsafe-inline' to default-src
+        <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *">
+        -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <title>VoiceMap</title>
+    <link rel="stylesheet" href="lib/framework7/css/framework7.material.min.css">
+    <link rel="stylesheet" href="lib/framework7/css/framework7.material.colors.min.css">
+    <link rel="stylesheet" href="arcgis/esri/css/esri.css" />
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="cordova.js"></script>
+
+</head>
+<body>
+    <div class="panel-overlay"></div>
+    <div class="panel panel-right panel-cover">
+        <a href="#" onclick="myApp.closePanel('right');" class="button color-gray" style="margin: 0px;padding: 0px;float: right;">
+            <i class="fa fa-times-circle" aria-hidden="true"></i>
+        </a>
+        <div style="background: #fff;" class="content-block">
+            <h1 id="user_name" style="margin-bottom: 0em;">Nombre Apellido</h1>
+            <p id="user_email" style="margin-top: 0;">correo@catastrobogota.gov.co</p>
+            <br />
+            <p class="buttons-row">
+                <a href="#" class="button button-fill button-raised color-red" onclick="logout();">Cerrar sesi&oacute;n</a>
+            </p>
+        </div>
+    </div>
+    <div class="views">
+        <div class="view view-main">
+            <div id="header" class="navbar">
+                <div class="navbar-inner" id="map-toolbar" style="display: none;">
+                    <div class="left">
+                        <a href="#" onclick="gotoListado();" class="link"><i class="fa fa-list" aria-hidden="true"></i></a>
+                    </div>
+                    <div class="center navcenter">VoiceMap</div>
+                    <div class="right">
+                        <a href="#" onclick="myApp.openPanel('right');" class="link"><i class="fa fa-user-circle-o" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+                <div class="navbar-inner" id="login-toolbar" style="display: none;">
+                    <div class="left">
+                        <a href="#" class="link"></a>
+                    </div>
+                    <div class="center navcenter">VoiceMap</div>
+                    <div class="right">
+                        <a href="#" onclick="login();" class="link"><i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+                <div class="navbar-inner" id="registro-toolbar" style="display: none;">
+                    <div class="left">
+                        <a href="#" onclick="gotoLogin();" class="link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a>
+                    </div>
+                    <div class="center navcenter">VoiceMap</div>
+                    <div class="right">
+                        <a href="#" onclick="submitRegistro();" class="link">Continuar</a>
+                    </div>
+                </div>
+                <div class="navbar-inner" id="listado-toolbar" style="display: none;">
+                    <div class="left">
+                        <a href="#" onclick="gotoMap();" class="link"><i class="fa fa-map" aria-hidden="true"></i></a>
+                    </div>
+                    <div class="center navcenter">VoiceMap</div>
+                    <div class="right">
+                        <a href="#" onclick="myApp.openPanel('right');" class="link"><i class="fa fa-user-circle-o" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+                <div class="navbar-inner" id="chat-toolbar" style="display: none;">
+                    <div class="left">
+                        <a href="#" onclick="gotoListado();" class="link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a>
+                    </div>
+                    <div class="center navcenter">VoiceMap</div>
+                    <div class="right">
+                        <a href="#" class="link"></a>
+                    </div>
+                </div>
+            </div>
+            <div class="speed-dial"  id="speed-dial" style="display: none;">
+                <a href="#" class="floating-button" style="background-color: #004167;">
+                    <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                    <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                </a>
+                <div class="speed-dial-buttons">
+                    <a href="#" onclick="gotoChat();" class="link" style="background-color: #004167;"><i class="fa fa-commenting" aria-hidden="true"></i></a>
+                    <a id="buttonLocation" href="#" onclick="setLocation();" class="link" style="background-color: #004167;"><i class="fa fa-map-marker" aria-hidden="true"></i></a>
+                    <a href="#" onclick="initLocationGPS();" class="link" style="background-color: #004167;"><i class="fa fa-street-view" aria-hidden="true"></i></a>                    
+                </div>
+            </div>
+            <div class="pages">
+                <div data-page="index" class="page navbar-fixed">
+                    <div class="page-content">
+                        <div id="loginDiv" style="display: none;">
+                            <div class="content-block">
+                               
+                            </div>
+                        </div>
+                        <div id="registroDiv" style="display: none;">
+                            <div class="content-block">
+                                <div class="content-block">
+                                    <p>Para iniciar ingresa tu correo:</p>
+                                    <div class="list-block">
+                                        <ul>
+                                            <li>
+                                                <div class="item-content">
+                                                    <div class="item-inner">
+                                                        <div class="item-input">
+                                                            <input id="fcorreo" type="email" placeholder="E-mail">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                        <p>Para registrarte, ingresa tus datos b&aacute;sicos:</p>
+                                        <div class="list-block">
+                                            <ul>
+                                                <li>
+                                                    <div class="item-content">
+                                                        <div class="item-inner">
+                                                            <div class="item-input">
+                                                                <input id="fnombres" type="text" placeholder="Nombres">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="item-content">
+                                                        <div class="item-inner">
+                                                            <div class="item-input">
+                                                                <input id="fapellidos" type="text" placeholder="Apellidos">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <label class="label-checkbox item-content">
+                                                        <input type="checkbox" id="terminosCheck" name="terminosCheck">
+                                                        <div class="item-media">
+                                                            <i class="icon icon-form-checkbox"></i>
+                                                        </div>
+                                                        <div class="item-inner">
+                                                            <div class="item-title">Acepto <a href="#" onclick="gotoTerminos();">t&eacute;rminos de uso</a></div>
+                                                        </div>
+                                                    </label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                
+                                </div>
+                            </div>
+                        </div>
+                        <div id="mapDiv"
+                             style="padding: 0px; width: 100%; position: absolute; top: 0px;" >
+                            <div id="map" style="padding: 0px; width: 100%; height: 100%;"></div>
+                        </div>
+                        <div id="listadoDiv" style="display: none;">
+                            <div class="content-block">
+                                <h1>Niveles (o Patrocinadores)</h1>
+                                <div class="list-block media-list">
+                                    <ul>
+                                        <li>
+                                            <a href="#" class="item-link item-content" onclick="gotoChat();">
+                                                <div class="item-media">
+                                                    <i class="fa fa-star" aria-hidden="true" style="font-size: 60px;color: white;background: green;border-radius: 50%;width: 80px;height: 80px;text-align: center;line-height: 80px;"></i>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title-row">
+                                                        <div class="item-title">Nivel 1</div>
+                                                    </div>
+                                                    <div class="item-subtitle">10 / 20</div>
+                                                    <div class="item-text">Lorem ipsum dolor sit amet...</div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="item-link item-content" onclick="gotoChat();">
+                                                <div class="item-media">
+                                                    <i class="fa fa-star" aria-hidden="true" style="font-size: 60px;color: white;background: yellow;border-radius: 50%;width: 80px;height: 80px;text-align: center;line-height: 80px;"></i>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title-row">
+                                                        <div class="item-title">Nivel 2</div>
+                                                    </div>
+                                                    <div class="item-subtitle">50%</div>
+                                                    <div class="item-text">Lorem ipsum dolor sit amet...</div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="item-link item-content" onclick="gotoChat();">
+                                                <div class="item-media">
+                                                    <i class="fa fa-star" aria-hidden="true" style="font-size: 60px;color: white;background: blue;border-radius: 50%;width: 80px;height: 80px;text-align: center;line-height: 80px;"></i>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title-row">
+                                                        <div class="item-title">Nivel 3</div>
+                                                    </div>
+                                                    <div class="item-subtitle">300 pts</div>
+                                                    <div class="item-text">Lorem ipsum dolor sit amet...</div>
+                                                </div>
+                                            </a>
+                                        </li>                                                                                
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="chatDiv" style="display: none;">
+                            <div class="content-block">
+                                <div class="card demo-card-header-pic">
+                                    <div valign="bottom" class="card-header color-white no-border" style="background-image:url(images/Patrocinador_UAECD.png);height: 30vw;background-size: cover;background-position: center;"></div>
+                                    <div class="card-content">
+                                        <div class="card-content-inner">
+                                            <p>Unidad Administrativa Especial de Catastro</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="card demo-card-header-pic">
+                                    <div valign="bottom" class="card-header color-white no-border" style="background-image:url(images/Patrocinador_Alcaldia.png);height: 30vw;background-size: cover;background-position: center;"></div>
+                                    <div class="card-content">
+                                        <div class="card-content-inner">
+                                            <p>Alcald&iacute;a Mayor de Bogot&aacute; </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <br />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="js/jquery.validity.js"></script>
+    <script type="text/javascript" src="lib/framework7/js/framework7.min.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+    <script type="text/javascript" src="arcgis/init.js"></script>
+
+</body>
+</html>

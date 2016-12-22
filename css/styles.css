@@ -1,0 +1,49 @@
+/*
+   statusbar-overlay sets the background color for the overlay. Black text is the default when the statusbar plugin is not added. When the
+   statusbar plugin is added, it also adds default setting to make the content white via:
+
+       <preference name="StatusBarStyle" value="lightcontent"/>
+
+   Setting the background color to black will allow the default light content (white text/icons) to show on it. The statusbar plugin is included
+   in the config.xml file and will be added by the CLI when you build locally.
+
+   See https://github.com/apache/cordova-plugin-statusbar
+*/
+
+.statusbar-overlay {
+    background: #000000;
+}
+
+.button-round-small {
+    width: 50px;
+    height: 50px;
+    border: 5px solid white;
+    border-radius: 50%;
+}
+
+.image_thumb {
+  display: block;
+  max-width:100px;
+  max-height:100px;
+  width: auto;
+  height: auto;
+  margin: 10px;
+}
+
+.esriControlsBR {
+    left: 5px !important;
+}
+
+.chip-media2 {
+    width: 64px !important;
+    border-radius: 0px !important;
+}
+
+.chip2 {
+    border-radius: 0px !important;
+}
+
+.navcenter {
+    width: 100% !important;
+    text-align: center !important;
+}
