@@ -59,7 +59,7 @@
                     </div>
                     <div class="center navcenter">VoiceMap</div>
                     <div class="right">
-                        <a href="#" onclick="login();" class="link"><i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+                        <a href="#" class="link"></a>
                     </div>
                 </div>
                 <div class="navbar-inner" id="registro-toolbar" style="display: none;">
@@ -104,65 +104,12 @@
             <div class="pages">
                 <div data-page="index" class="page navbar-fixed">
                     <div class="page-content">
-                        <div id="loginDiv" style="display: none;">
-                            <div class="content-block">
-                               
-                            </div>
-                        </div>
-                        <div id="registroDiv" style="display: none;">
-                            <div class="content-block">
-                                <div class="content-block">
-                                    <p>Para iniciar ingresa tu correo:</p>
-                                    <div class="list-block">
-                                        <ul>
-                                            <li>
-                                                <div class="item-content">
-                                                    <div class="item-inner">
-                                                        <div class="item-input">
-                                                            <input id="fcorreo" type="email" placeholder="E-mail">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </div>
-
-                                        <p>Para registrarte, ingresa tus datos b&aacute;sicos:</p>
-                                        <div class="list-block">
-                                            <ul>
-                                                <li>
-                                                    <div class="item-content">
-                                                        <div class="item-inner">
-                                                            <div class="item-input">
-                                                                <input id="fnombres" type="text" placeholder="Nombres">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="item-content">
-                                                        <div class="item-inner">
-                                                            <div class="item-input">
-                                                                <input id="fapellidos" type="text" placeholder="Apellidos">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <label class="label-checkbox item-content">
-                                                        <input type="checkbox" id="terminosCheck" name="terminosCheck">
-                                                        <div class="item-media">
-                                                            <i class="icon icon-form-checkbox"></i>
-                                                        </div>
-                                                        <div class="item-inner">
-                                                            <div class="item-title">Acepto <a href="#" onclick="gotoTerminos();">t&eacute;rminos de uso</a></div>
-                                                        </div>
-                                                    </label>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                
-                                </div>
+                        <div id="loginDiv" style="display: none;text-align: center;">
+                            <div class="content-block" style="width: 50%; display: inline-block;">
+                                <br />
+                                <img src="images/Patrocinador_Alcaldia.png" style="width: 100%;" />
+                                <br />
+                                <a href="#" class="button button-fill button-raised" onclick="login();" style="width: 100%;">Iniciar Sesion</a>
                             </div>
                         </div>
                         <div id="mapDiv"

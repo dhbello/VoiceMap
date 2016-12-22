@@ -23,12 +23,7 @@ var _url_msg = 'https://20161105t160625-dot-dinamica-147714.appspot.com/Registro
 var _url_user = 'https://20161105t160625-dot-dinamica-147714.appspot.com/UsuarioRegistro?';
 var _url_balance = 'https://20161105t160625-dot-dinamica-147714.appspot.com/UsuarioBalance?';
 
-if (window.localStorage.getItem("user") == null) {
-    gotoLogin();
-} else {
-    gotoMap();
-    updateUser();
-};
+gotoLogin();
 
 if (isPhoneGapExclusive()) {
     document.addEventListener("deviceready", onDeviceReady, false);
@@ -48,27 +43,7 @@ function onDeviceReady() {
 function init() {
     currentUser = window.localStorage.getItem("user");
     if (isPhoneGapExclusive()) {
-
-        try {
-            window.plugins.googleplus.isAvailable(function (avail) { alert(avail) });            
-        } catch (err) {
-            alert(0);
-        }
-
-        try {
-            window.plugins.googleplus.login(
-               {},
-               function (obj) {
-                   alert(JSON.stringify(obj));
-               },
-               function (msg) {
-                   alert("error: " + msg);
-               }
-            );
-        } catch (err) {
-            alert(1);
-        }
-        
+        login();
         try {
             var push = PushNotification.init({
                 android: {
@@ -101,13 +76,21 @@ function init() {
                 // e.message
             });
         } catch (err) {
-            alert(2);
-        }        
+            alert("error:" + JSON.stringify(err));
+        }
 
         if ((navigator.connection.type == 0) || (navigator.connection.type == 'none')) {
             sendAlert('Esta aplicaci&oacute;n requiere conexi&oacute;n a internet.');
             $("#bienvenida-toolbar").hide();
         }
+    } else {
+        gotoLogin();
+        if (window.localStorage.getItem("user") == null) {
+            gotoLogin();
+        } else {
+            gotoMap();
+            updateUser();
+        };
     }
     initMap();
 }
@@ -212,8 +195,6 @@ function hideAll() {
 
     $("#loginDiv").hide();
     $("#login-toolbar").hide();
-    $("#registroDiv").hide();
-    $("#registro-toolbar").hide();
     $("#listadoDiv").hide();
     $("#listado-toolbar").hide();
     $("#chatDiv").hide();
@@ -221,54 +202,25 @@ function hideAll() {
 };
 
 function login() {
-    hideAll();
-    gotoMap();
-    updateUser();
-};
-
-function submitRegistro() {   
-        $.validity.start();
-        $("#fnombres").require();
-        if ($.validity.end().errors > 0) {
-            sendAlert('Debe ingresar su nombre.');
-            return;
-        };
-        $.validity.start();
-        $("#fapellidos").require();
-        if ($.validity.end().errors > 0) {
-            sendAlert('Debe ingresar su apellido.');
-            return;
-        };
-        if ($("#terminosCheck").prop('checked') == false) {
-            sendAlert('Debe aceptar los terminos de uso.');
-            return;
-        }
-        $.ajax({
-            url: _url_user + "email=" + encodeURIComponent($("#fcorreo").val().toLowerCase()) +
-                "&nombres=" + encodeURIComponent($("#fnombres").val()) + "&apellidos=" + encodeURIComponent($("#fapellidos").val()),
-            type: 'POST',
-            dataType: 'json',
-            success: function (response) {
-                myApp.hidePreloader();
-                if (response.status == "true") {
-                    currentUser = $("#fcorreo").val().toLowerCase();
-                    window.localStorage.setItem("user", currentUser);
+    if (isPhoneGapExclusive()) {
+        window.plugins.googleplus.trySilentLogin({
+            'webClientId': "394219421908-hsc5q45ah24ppo7i2bhhga2cc1k3nncb.apps.googleusercontent.com"
+        },
+                function (obj) {
+                    alert(JSON.stringify(obj));
+                    hideAll();
                     gotoMap();
                     updateUser();
-                } else {
-                    setTimeout(function () {
-                        sendAlert('No se pudo registrar el usuario, por favor, intente m&aacute;s tarde.');
-                    }, 1500);
-                };
-            },
-            error: function () {
-                myApp.hidePreloader();
-                setTimeout(function () {
-                    sendAlert('No se pudo registrar el usuario, por favor, intente m&aacute;s tarde.');
-                }, 1500);
-
-            }
-        });
+                },
+                function (msg) {
+                    alert("error: " + msg);
+                }
+             );
+    } else {
+        hideAll();
+        gotoMap();
+        updateUser();
+    }    
 };
 
 function gotoLogin() {
@@ -287,12 +239,6 @@ function gotoMap() {
 
     modeManual = false;
     $("#buttonLocation").css("background-color", "#004167");
-};
-
-function gotoRegistro() {
-    hideAll();
-    $("#registroDiv").show();
-    $("#registro-toolbar").show();
 };
 
 function gotoListado() {
@@ -361,18 +307,31 @@ function uploadFail(error) {
 };
 
 function submitMsg() {
-    
+
 };
 
 function updateUser() {
-    
+
 };
 
 function logout() {
     myApp.closePanel('right');
-    currentUser = null;
-    window.localStorage.removeItem("user");
-    gotoLogin();
+    if (isPhoneGapExclusive()) {
+        window.plugins.googleplus.logout(
+            function (msg) {
+                currentUser = null;
+                window.localStorage.removeItem("user");
+                gotoLogin();
+            },
+            function (msg) {
+                
+            }
+        );
+    } else {
+        currentUser = null;
+        window.localStorage.removeItem("user");
+        gotoLogin();
+    }
 };
 
 function sendAlert(text) {
