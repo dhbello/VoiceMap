@@ -19,10 +19,7 @@ var photoURLS = new Array();
 var msgtitle = "VoiceMap";
 var baseMapUrl = "http://serviciosgis.catastrobogota.gov.co/arcgis/rest/services/Mapa_Referencia/Mapa_Base/MapServer";
 
-var _url_photo = 'https://dinamica-147714.appspot.com/Imagen';
-var _url_msg = 'https://20161105t160625-dot-dinamica-147714.appspot.com/Registro?';
-var _url_user = 'https://20161105t160625-dot-dinamica-147714.appspot.com/UsuarioRegistro?';
-var _url_balance = 'https://20161105t160625-dot-dinamica-147714.appspot.com/UsuarioBalance?';
+var _url_registro = 'https://voicemap-155422.appspot.com/Registro?';
 
 gotoLogin();
 
@@ -210,7 +207,18 @@ function login() {
         window.plugins.googleplus.trySilentLogin({},
                 function (obj) {
                     obj.registrationId = registrationData;
-                    alert(JSON.stringify(obj));                    
+                    var registroURL = _url_registro + "email=" + encodeURIComponent(obj.email)
+                          + "&userId=" + obj.userId + "&name=" + encodeURIComponent(obj.displayName) + "&photo=" + encodeURIComponent(obj.imageUrl) + "&registrationId=" + encodeURIComponent(obj.registrationId);
+                    $.ajax({
+                        url: registroURL,
+                        type: 'GET',
+                        success: function () {
+                           
+                        },
+                        error: function () {
+                           
+                        }
+                    });                                     
                     hideAll();
                     gotoMap();
                     updateUser();
@@ -222,7 +230,18 @@ function login() {
                     },
                     function (obj) {
                         obj.registrationId = registrationData;
-                        alert(JSON.stringify(obj));
+                        var registroURL = _url_registro + "email=" + encodeURIComponent(obj.email)
+                          + "&userId=" + obj.userId + "&name=" + encodeURIComponent(obj.displayName) + "&photo=" + encodeURIComponent(obj.imageUrl) + "&registrationId=" + encodeURIComponent(obj.registrationId);
+                        $.ajax({
+                            url: registroURL,
+                            type: 'GET',
+                            success: function () {
+
+                            },
+                            error: function () {
+
+                            }
+                        });
                         hideAll();
                         gotoMap();
                         updateUser();
