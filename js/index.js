@@ -19,7 +19,7 @@ var photoURLS = new Array();
 var msgtitle = "VoiceMap";
 var baseMapUrl = "http://serviciosgis.catastrobogota.gov.co/arcgis/rest/services/Mapa_Referencia/Mapa_Base/MapServer";
 
-var _url_registro = 'https://voicemap-155422.appspot.com/Registro?';
+var _url_registro = 'https://voicemap-153216.appspot.com/Registro?';
 
 gotoLogin();
 
