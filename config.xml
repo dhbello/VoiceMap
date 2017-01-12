@@ -82,8 +82,6 @@
   <plugin name="cordova-plugin-googleplus" source="npm">
     <variable name="REVERSED_CLIENT_ID" value="com.googleusercontent.apps.394219421908-7mibib5rap3b831nchjvv4b4em9kir9s" />
   </plugin>
-
-  <plugin name="cordova-plugin-crosswalk-webview" />
   
   <!-- Third party plugins -->
   <!-- A list of available plugins are available at https://build.phonegap.com/plugins -->

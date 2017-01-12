@@ -12,6 +12,7 @@ var glPointG;
 var currentPoint;
 var currentUser;
 var imageCache;
+var registrationData;
 
 var modeManual = false;
 var photoURLS = new Array();
@@ -57,12 +58,11 @@ function init() {
             });
 
             push.on('registration', function (data) {
-                alert(JSON.stringify(data));
-                // data.registrationId
+                registrationData = data.registrationId;
             });
 
             push.on('notification', function (data) {
-                alert(JSON.stringify(data));
+                alert(data.message);
                 // data.message,
                 // data.title,
                 // data.count,
@@ -199,13 +199,18 @@ function hideAll() {
     $("#listado-toolbar").hide();
     $("#chatDiv").hide();
     $("#chat-toolbar").hide();
+    $("#settingsDiv").hide();
+    $("#settings-toolbar").hide();
+    
+    myApp.hideToolbar(".toolbar");
 };
 
 function login() {
     if (isPhoneGapExclusive()) {
         window.plugins.googleplus.trySilentLogin({},
                 function (obj) {
-                    alert(JSON.stringify(obj));
+                    obj.registrationId = registrationData;
+                    alert(JSON.stringify(obj));                    
                     hideAll();
                     gotoMap();
                     updateUser();
@@ -216,6 +221,7 @@ function login() {
                         offline: true
                     },
                     function (obj) {
+                        obj.registrationId = registrationData;
                         alert(JSON.stringify(obj));
                         hideAll();
                         gotoMap();
@@ -258,10 +264,17 @@ function gotoListado() {
     $("#listado-toolbar").show();
 }
 
+function gotoSettings() {
+    hideAll();
+    $("#settingsDiv").show();
+    $("#settings-toolbar").show();
+}
+
 function gotoChat() {
     hideAll();
     $("#chatDiv").show();
     $("#chat-toolbar").show();
+    myApp.showToolbar(".toolbar");
 }
 
 function dial() {
@@ -270,6 +283,12 @@ function dial() {
     } else {
         $('#speed-dial').addClass('speed-dial-opened');
     }
+};
+
+function nuevoParticipante() {
+    myApp.prompt('Correo del nuevo participante?', function (value) {
+        myApp.alert('Nuevo participante "' + value + '" agregado.');
+    });
 };
 
 function addPhotos(sourceType) {
