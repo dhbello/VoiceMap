@@ -32,8 +32,8 @@ var baseMapUrl = "http://serviciosgis.catastrobogota.gov.co/arcgis/rest/services
 var _url_registro = 'https://voicemap-153216.appspot.com/Registro?';
 var _url_conversacion = 'https://voicemap-153216.appspot.com/Conversacion?';
 var _url_mensajes = 'https://voicemap-153216.appspot.com/Mensaje?';
-var _url_photo = 'https://dinamica-147714.appspot.com/Imagen?';
-var _url_audio = 'https://dinamica-147714.appspot.com/Audio?';
+var _url_photo = 'https://voicemap-153216.appspot.com/Imagen?';
+var _url_audio = 'https://voicemap-153216.appspot.com/Audio?';
 
 gotoLogin();
 
@@ -494,7 +494,7 @@ function captureAudioSuccess(audioURI) {
     options.fileKey = "nva_audio";
     options.fileName = "audio_" + new Date().getTime();
     ft = new FileTransfer();
-    ft.upload(audioURI[0].localURL, _url_audio + "cmd=create&conversacionId=" + currentChat + "&id=" + new Date().getTime() + "&email=" + encodeURIComponent(currentUser.email), uploadAudioSuccessFT, uploadAudioFail, options);
+    ft.upload(audioURI[0].localURL, _url_audio + "conversacionId=" + currentChat + "&id=" + new Date().getTime() + "&email=" + encodeURIComponent(currentUser.email), uploadAudioSuccessFT, uploadAudioFail, options);
 }
 
 function captureAudioFail(audioURI) {
@@ -532,7 +532,7 @@ function captureImagenSuccess(imageURI) {
     options.fileKey = "nva_imagen";
     options.fileName = "imagen_" + new Date().getTime() + ".jpg";
     ft = new FileTransfer();
-    ft.upload(imageURI, _url_photo + "cmd=create&conversacionId=" + currentChat + "&id=" + new Date().getTime() + "&email=" + encodeURIComponent(currentUser.email), uploadImagenSuccessFT, uploadImagenFail, options);
+    ft.upload(imageURI, _url_photo + "conversacionId=" + currentChat + "&id=" + new Date().getTime() + "&email=" + encodeURIComponent(currentUser.email), uploadImagenSuccessFT, uploadImagenFail, options);
 }
 
 function captureImagenFail(imageURI) {
