@@ -494,7 +494,7 @@ function captureAudioSuccess(audioURI) {
     options.fileKey = "nva_audio";
     options.fileName = "audio_" + new Date().getTime();
     ft = new FileTransfer();
-    ft.upload(audioURI[0], _url_audio + "cmd=create&conversacionId=" + currentChat + "&id=" + new Date().getTime() + "&email=" + encodeURIComponent(currentUser.email), uploadAudioSuccessFT, uploadAudioFail, options);
+    ft.upload(audioURI[0].localURL, _url_audio + "cmd=create&conversacionId=" + currentChat + "&id=" + new Date().getTime() + "&email=" + encodeURIComponent(currentUser.email), uploadAudioSuccessFT, uploadAudioFail, options);
 }
 
 function captureAudioFail(audioURI) {
@@ -524,7 +524,7 @@ function addPhotos(sourceType) {
     });
 };
 
-function captureSuccess(imageURI) {
+function captureImagenSuccess(imageURI) {
     myApp.showPreloader("Cargando foto, por favor, espere.");
 
     var fail, ft, options, params, win;
