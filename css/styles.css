@@ -78,6 +78,8 @@
   }
   .facebook-card .card-content img {
     display: block;
+    width: 100%;
+    height: auto;
   }
   .facebook-card .card-content-inner {
     padding: 15px 10px;

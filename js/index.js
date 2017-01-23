@@ -498,10 +498,14 @@ function captureAudioSuccess(audioURI) {
 }
 
 function captureAudioFail(audioURI) {
-    sendAlert("Error en la captura del audio");
+    myApp.hidePreloader();
+    setTimeout(function () {
+        sendAlert("Error en la captura del audio");
+    }, 1500);    
 }
 
 function uploadAudioSuccessFT(response) {
+    myApp.hidePreloader();
     gotoChat(currentChat);
 };
 
@@ -536,10 +540,14 @@ function captureImagenSuccess(imageURI) {
 }
 
 function captureImagenFail(imageURI) {
-    sendAlert("Error en la captura de la imagen");
+    myApp.hidePreloader();
+    setTimeout(function () {
+        sendAlert("Error en la captura de la imagen");
+    }, 1500);    
 }
 
 function uploadImagenSuccessFT(response) {
+    myApp.hidePreloader();
     gotoChat(currentChat);
 };
 
