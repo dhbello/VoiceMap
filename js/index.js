@@ -32,8 +32,8 @@ var baseMapUrl = "http://serviciosgis.catastrobogota.gov.co/arcgis/rest/services
 var _url_registro = 'https://voicemap-153216.appspot.com/Registro?';
 var _url_conversacion = 'https://voicemap-153216.appspot.com/Conversacion?';
 var _url_mensajes = 'https://voicemap-153216.appspot.com/Mensaje?';
-var _url_photo = 'https://dinamica-147714.appspot.com/Imagen';
-var _url_audio = 'https://dinamica-147714.appspot.com/Audio';
+var _url_photo = 'https://dinamica-147714.appspot.com/Imagen?';
+var _url_audio = 'https://dinamica-147714.appspot.com/Audio?';
 
 gotoLogin();
 
