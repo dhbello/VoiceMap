@@ -487,7 +487,7 @@ function sendAudio() {
 }
 
 function captureAudioSuccess(audioURI) {
-    myApp.showPreloader("Cargando audio, por favor, espere." + JSON.stringify(audioURI));
+    myApp.showPreloader("Cargando audio, por favor, espere.");
 
     var fail, ft, options, params, win;
     options = new FileUploadOptions();
@@ -618,7 +618,7 @@ function updateParticipantes() {
         strHtml = strHtml + "<div class='item-inner'>";
         strHtml = strHtml + "<div class='item-title-row'>";
         strHtml = strHtml + "<div class='item-title'>" + cacheParticipantes[i] + "</div>";
-        strHtml = strHtml + "<div class='item-subtitle'><a href='#' class=''><i class='fa fa-trash' aria-hidden='true'></i></a></div>";
+        strHtml = strHtml + "<div class='item-subtitle'><a href='#' onclick='deleteParticipante(" + i + ");' class=''><i class='fa fa-trash' aria-hidden='true'></i></a></div>";
         strHtml = strHtml + "</div>";
         strHtml = strHtml + "</div>";
         strHtml = strHtml + "</div>";
@@ -626,6 +626,11 @@ function updateParticipantes() {
         $("#listadoParticipantes").append(strHtml);
     };
 };
+
+function deleteParticipante(pos) {
+    cacheParticipantes.splice(pos, 1);
+    updateParticipantes();
+}
 
 function logout() {
     myApp.closePanel('right');
