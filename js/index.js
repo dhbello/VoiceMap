@@ -111,7 +111,9 @@ function initMap() {
         dojo.require("esri.layers.MapImageLayer");
         dojo.require("esri.layers.MapImage");
         dojo.require("esri.graphic");
+        dojo.require("esri.graphicsUtils");
         dojo.require("esri.symbols.PictureMarkerSymbol");
+        dojo.require("esri.geometry.webMercatorUtils");
         dojo.addOnLoad(initMap2);
     } catch (err) {
 
@@ -577,6 +579,7 @@ function updateUser() {
     $("#user_name").html(currentUser.displayName);
     $("#user_email").html(currentUser.email);
     $("#listadoConversaciones").html("");
+    var localExtent;
     for (var i = 0; i < currentChats.length; i++) {
         var strHtml = "<li>";
         strHtml = strHtml + "<a href='#' class='item-link item-content' onclick='gotoChat(\"" + currentChats[i].id + "\");'>";
@@ -587,7 +590,7 @@ function updateUser() {
         strHtml = strHtml + "<div class='item-title-row'>";
         strHtml = strHtml + "<div class='item-title'>" + currentChats[i].titulo + "</div>";
         strHtml = strHtml + "</div>";
-        //strHtml = strHtml + "<div class='item-subtitle'>Persona 1, Persona 2, Persona 3</div>";
+        strHtml = strHtml + "<div class='item-subtitle'>" + currentChats[i].direccion + "</div>";
         //strHtml = strHtml + "<div class='item-text'>Ultimo mensaje: Fecha y texto...</div>";        
         strHtml = strHtml + "</div>";
         strHtml = strHtml + "</a>";
@@ -601,12 +604,23 @@ function updateUser() {
             var currentPointG = new esri.Graphic(currentPoint, markerG);
             currentPointG.setAttributes({ conversacionId: currentChats[i].id });
             glPointG.add(currentPointG, null, null);
+            /*
+            if (localExtent == null) {
+                localExtent = new esri.geometry.Extent(currentPointG.geometry.getExtent());
+            } else {
+                localExtent = localExtent.union(currentPointG.geometry.getExtent());
+            }*/
         } catch (err) {
 
         }
 
 
     }
+    /*
+    if (localExtent != null) {
+        map.setExtent(localExtent.getExtent());
+    }
+    */
 };
 
 function updateParticipantes() {
