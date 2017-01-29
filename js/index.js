@@ -63,6 +63,7 @@ function init() {
                     senderID: "394219421908"
                 },
                 ios: {
+                    senderID: "394219421908",
                     alert: "true",
                     badge: "true",
                     sound: "true"
@@ -70,7 +71,7 @@ function init() {
             });
 
             push.on('registration', function (data) {
-                registrationData = devicePlatform + " " + data.registrationId;
+                registrationData = devicePlatform + ":" + data.registrationId;
             });
 
             push.on('notification', function (data) {
