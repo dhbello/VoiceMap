@@ -2,6 +2,7 @@ var myApp = new Framework7({
     fastClicks: false
 });
 var $$ = Dom7;
+var devicePlatform;
 
 var map;
 var view;
@@ -54,6 +55,7 @@ function onDeviceReady() {
 
 function init() {
     if (isPhoneGapExclusive()) {
+        devicePlatform = device.platform;
         gotoLogin();
         try {
             var push = PushNotification.init({
@@ -68,7 +70,7 @@ function init() {
             });
 
             push.on('registration', function (data) {
-                registrationData = data.registrationId;
+                registrationData = devicePlatform + " " + data.registrationId;
             });
 
             push.on('notification', function (data) {
@@ -496,7 +498,7 @@ function captureAudioSuccess(audioURI) {
     options.fileKey = "nva_audio";
     options.fileName = "audio_" + new Date().getTime();
     ft = new FileTransfer();
-    ft.upload(audioURI[0].localURL, _url_audio + "conversacionId=" + currentChat + "&id=" + new Date().getTime() + "&email=" + encodeURIComponent(currentUser.email), uploadAudioSuccessFT, uploadAudioFail, options);
+    ft.upload(audioURI[0].localURL, _url_audio + "filename=" + audioURI[0].name + "&conversacionId=" + currentChat + "&id=" + new Date().getTime() + "&email=" + encodeURIComponent(currentUser.email), uploadAudioSuccessFT, uploadAudioFail, options);
 }
 
 function captureAudioFail(audioURI) {
