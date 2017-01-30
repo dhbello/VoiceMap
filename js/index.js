@@ -75,13 +75,17 @@ function init() {
             });
 
             push.on('notification', function (data) {
-                alert(data.message);
+                alert(JSON.stringify(data));
                 // data.message,
                 // data.title,
                 // data.count,
                 // data.sound,
                 // data.image,
                 // data.additionalData
+                updateUser();
+                if ($("#chatDiv").is(":visible")) {
+                    gotoChat(currentChat);
+                };
             });
 
             push.on('error', function (e) {
