@@ -75,12 +75,7 @@ function init() {
             });
 
             push.on('notification', function (data) {
-                alert(JSON.stringify(data));
-                // data.message,
-                // data.title,
-                // data.count,
-                // data.sound,
-                // data.image,
+                //alert(JSON.stringify(data));
                 // data.additionalData
                 updateUser();
                 if ($("#chatDiv").is(":visible")) {
