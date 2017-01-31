@@ -221,10 +221,10 @@ function hideAll() {
 };
 
 function slogin() {
-    myApp.showPreloader('Iniciando sesi&oacute;n');
     if (isPhoneGapExclusive()) {
         window.plugins.googleplus.trySilentLogin({},
                 function (obj) {
+                    myApp.showPreloader('Iniciando sesi&oacute;n');
                     obj.registrationId = registrationData;
                     currentUser = obj;
                     var registroURL = _url_registro + "email=" + encodeURIComponent(currentUser.email)
@@ -249,7 +249,7 @@ function slogin() {
                     });
                 },
                 function (msg) {
-
+                    myApp.hidePreloader();
                 }
              );
     } else {
@@ -281,9 +281,9 @@ function login() {
     myApp.showPreloader('Iniciando sesi&oacute;n');
     if (isPhoneGapExclusive()) {
         window.plugins.googleplus.login({
-            'webClientId': "394219421908-hsc5q45ah24ppo7i2bhhga2cc1k3nncb.apps.googleusercontent.com",
-            offline: true
-        },
+                    'webClientId': "394219421908-hsc5q45ah24ppo7i2bhhga2cc1k3nncb.apps.googleusercontent.com",
+                    offline: true
+                },
                 function (obj) {
                     obj.registrationId = registrationData;
                     currentUser = obj;
@@ -309,7 +309,10 @@ function login() {
                     });
                 },
                 function (msg) {
-                    sendAlert("Error en el inicio de session.");
+                    myApp.hidePreloader();
+                    setTimeout(function () {
+                        sendAlert("Error en el inicio de session.");
+                    }, 1500);
                 });
 
     };
