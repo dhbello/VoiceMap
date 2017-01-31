@@ -56,8 +56,10 @@ function onDeviceReady() {
 function init() {
     if (isPhoneGapExclusive()) {
         devicePlatform = device.platform;
-        gotoLogin();
         try {
+            if ((navigator.connection.type == 0) || (navigator.connection.type == 'none')) {
+                sendAlert('Esta aplicaci&oacute;n requiere conexi&oacute;n a internet.');
+            }
             var push = PushNotification.init({
                 android: {
                     senderID: "394219421908"
@@ -72,6 +74,7 @@ function init() {
 
             push.on('registration', function (data) {
                 registrationData = devicePlatform + ":" + data.registrationId;
+                slogin();
             });
 
             push.on('notification', function (data) {
@@ -91,18 +94,8 @@ function init() {
         } catch (err) {
             alert(err);
         }
-
-        if ((navigator.connection.type == 0) || (navigator.connection.type == 'none')) {
-            sendAlert('Esta aplicaci&oacute;n requiere conexi&oacute;n a internet.');
-            $("#bienvenida-toolbar").hide();
-        }
     } else {
-        if (window.localStorage.getItem("user") == null) {
-            gotoLogin();
-        } else {
-            gotoMap();
-            updateUser();
-        };
+        slogin();
     }
     initMap();
 }
@@ -227,7 +220,8 @@ function hideAll() {
     myApp.hideToolbar(".toolbar");
 };
 
-function login() {
+function slogin() {
+    myApp.showPreloader('Iniciando sesi&oacute;n');
     if (isPhoneGapExclusive()) {
         window.plugins.googleplus.trySilentLogin({},
                 function (obj) {
@@ -240,48 +234,22 @@ function login() {
                         type: 'GET',
                         dataType: 'json',
                         success: function (response) {
+                            myApp.hidePreloader();
                             currentChats = response.conversaciones;
                             hideAll();
                             gotoMap();
                             updateUser();
                         },
                         error: function () {
-                            sendAlert("Error en el inicio de session.");
+                            myApp.hidePreloader();
+                            setTimeout(function () {
+                                sendAlert("Error en el inicio de session.");
+                            }, 1500);
                         }
                     });
                 },
                 function (msg) {
-                    window.plugins.googleplus.login({
-                        'webClientId': "394219421908-hsc5q45ah24ppo7i2bhhga2cc1k3nncb.apps.googleusercontent.com",
-                        offline: true
-                    },
-                    function (obj) {
-                        obj.registrationId = registrationData;
-                        currentUser = obj;
-                        var registroURL = _url_registro + "email=" + encodeURIComponent(currentUser.email)
-                          + "&userId=" + currentUser.userId + "&displayName=" + encodeURIComponent(currentUser.displayName) + "&imageUrl=" + encodeURIComponent(currentUser.imageUrl) + "&registrationId=" + encodeURIComponent(currentUser.registrationId);
-                        $.ajax({
-                            url: registroURL,
-                            type: 'GET',
-                            dataType: 'json',
-                            success: function (response) {
-                                currentChats = response.conversaciones;
-                                hideAll();
-                                gotoMap();
-                                updateUser();
-                            },
-                            error: function () {
-                                sendAlert("Error en el inicio de session.");
-                            }
-                        });
-                        hideAll();
-                        gotoMap();
-                        updateUser();
-                    },
-                    function (msg) {
-                        alert("error: " + msg);
-                    }
-                 );
+
                 }
              );
     } else {
@@ -293,16 +261,58 @@ function login() {
             type: 'GET',
             dataType: 'json',
             success: function (response) {
+                myApp.hidePreloader();
                 currentChats = response.conversaciones;
                 hideAll();
                 gotoMap();
                 updateUser();
             },
             error: function () {
-                sendAlert("Error en el inicio de session.");
+                myApp.hidePreloader();
+                setTimeout(function () {
+                    sendAlert("Error en el inicio de session.");
+                }, 1500);
             }
         });
     }
+}
+
+function login() {
+    myApp.showPreloader('Iniciando sesi&oacute;n');
+    if (isPhoneGapExclusive()) {
+        window.plugins.googleplus.login({
+            'webClientId': "394219421908-hsc5q45ah24ppo7i2bhhga2cc1k3nncb.apps.googleusercontent.com",
+            offline: true
+        },
+                function (obj) {
+                    obj.registrationId = registrationData;
+                    currentUser = obj;
+                    var registroURL = _url_registro + "email=" + encodeURIComponent(currentUser.email)
+                      + "&userId=" + currentUser.userId + "&displayName=" + encodeURIComponent(currentUser.displayName) + "&imageUrl=" + encodeURIComponent(currentUser.imageUrl) + "&registrationId=" + encodeURIComponent(currentUser.registrationId);
+                    $.ajax({
+                        url: registroURL,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (response) {
+                            myApp.hidePreloader();
+                            currentChats = response.conversaciones;
+                            hideAll();
+                            gotoMap();
+                            updateUser();
+                        },
+                        error: function () {
+                            myApp.hidePreloader();
+                            setTimeout(function () {
+                                sendAlert("Error en el inicio de session.");
+                            }, 1500);
+                        }
+                    });
+                },
+                function (msg) {
+                    sendAlert("Error en el inicio de session.");
+                });
+
+    };
 };
 
 function gotoLogin() {
@@ -505,7 +515,7 @@ function captureAudioFail(audioURI) {
     myApp.hidePreloader();
     setTimeout(function () {
         sendAlert("Error en la captura del audio");
-    }, 1500);    
+    }, 1500);
 }
 
 function uploadAudioSuccessFT(response) {
@@ -547,7 +557,7 @@ function captureImagenFail(imageURI) {
     myApp.hidePreloader();
     setTimeout(function () {
         sendAlert("Error en la captura de la imagen");
-    }, 1500);    
+    }, 1500);
 }
 
 function uploadImagenSuccessFT(response) {
@@ -654,7 +664,6 @@ function logout() {
         window.plugins.googleplus.logout(
             function (msg) {
                 currentUser = null;
-                window.localStorage.removeItem("user");
                 gotoLogin();
             },
             function (msg) {
@@ -663,7 +672,6 @@ function logout() {
         );
     } else {
         currentUser = null;
-        window.localStorage.removeItem("user");
         gotoLogin();
     }
 };
