@@ -511,7 +511,7 @@ function captureAudioSuccess(audioURI) {
     options.fileKey = "nva_audio";
     options.fileName = "audio_" + new Date().getTime();
     ft = new FileTransfer();
-    ft.upload(audioURI[0].localURL, _url_audio + "filename=" + audioURI[0].name + "&conversacionId=" + currentChat + "&id=" + new Date().getTime() + "&email=" + encodeURIComponent(currentUser.email), uploadAudioSuccessFT, uploadAudioFail, options);
+    ft.upload(audioURI[0].localURL, _url_audio + "filename=" + audioURI[0].localURL + "&conversacionId=" + currentChat + "&id=" + new Date().getTime() + "&email=" + encodeURIComponent(currentUser.email), uploadAudioSuccessFT, uploadAudioFail, options);
 }
 
 function captureAudioFail(audioURI) {
