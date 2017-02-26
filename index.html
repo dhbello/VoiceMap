@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="lib/framework7/css/framework7.material.min.css">
     <link rel="stylesheet" href="lib/framework7/css/framework7.material.colors.min.css">
     <link rel="stylesheet" href="arcgis/esri/css/esri.css" />
+    <!--<link rel="stylesheet" href="https://js.arcgis.com/3.19/esri/css/esri.css">-->
     <link rel="stylesheet" href="css/font-awesome.min.css">
     <link rel="stylesheet" href="css/styles.css">
     <script src="cordova.js"></script>
@@ -107,17 +108,7 @@
                     <a href="#" onclick="sendAudio();" class="link" style="background-color: #004167;"><i class="fa fa-microphone" aria-hidden="true"></i></a>
                 </div>
             </div>
-                <div class="speed-dial" id="speed-dial" style="display: none;">
-                    <a href="#" class="floating-button" style="background-color: #004167;">
-                        <i class="fa fa-arrow-up" aria-hidden="true"></i>
-                        <i class="fa fa-arrow-down" aria-hidden="true"></i>
-                    </a>
-                    <div class="speed-dial-buttons">
-                        <a href="#" onclick="gotonewChat();" class="link" style="background-color: #004167;"><i class="fa fa-commenting" aria-hidden="true"></i></a>
-                        <a id="buttonLocation" href="#" onclick="setLocation();" class="link" style="background-color: #004167;"><i class="fa fa-map-marker" aria-hidden="true"></i></a>
-                        <a href="#" onclick="initLocationGPS();" class="link" style="background-color: #004167;"><i class="fa fa-street-view" aria-hidden="true"></i></a>
-                    </div>
-                </div>
+                <a href="#" id="speed-dial" style="display: none;background-color: #004167;" class="floating-button link" onclick="initLocationGPS();"><i class="fa fa-street-view" aria-hidden="true"></i></a>
                 <div class="pages">
                     <div data-page="index" class="page navbar-fixed">
                         <div class="page-content">
@@ -143,6 +134,11 @@
                                 </div>
                             </div>
                             <div id="chatDiv" style="display: none;">
+                                <div id="detalleChat">
+                                    <div id="mapDetalle" style="height: 200px; width: 100%;">
+                                    </div>
+                                    <div id="dirDetalle"></div>
+                                </div>
                                 <div class="content-block" id="listadoMensajes">
                                     
                                 </div>
@@ -191,7 +187,8 @@
     <script type="text/javascript" src="js/jquery.validity.js"></script>
     <script type="text/javascript" src="lib/framework7/js/framework7.min.js"></script>
     <script type="text/javascript" src="js/index.js"></script>
-    <script type="text/javascript" src="arcgis/init.js"></script>
+    <script type="text/javascript" src="arcgis/dojo/dojo.js"></script>
+    <!--<script src="https://js.arcgis.com/3.19/"></script>-->
 
 </body>
 </html>

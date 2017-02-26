@@ -5,14 +5,25 @@ var $$ = Dom7;
 var devicePlatform;
 
 var map;
-var view;
+var mapDetalle;
+
 var mapLayer;
+var mapLayer2;
 
 var marker;
 var markerG;
 
 var glPoint;
+var glPoint2;
 var glPointG;
+
+var _Map;
+var _ArcGISTiledMapServiceLayer;
+var _GraphicsLayer;
+var _PictureMarkerSymbol;
+var _Point;
+var _Polyline;
+var _Graphic;
 
 var currentPointX;
 var currentPointY;
@@ -25,7 +36,6 @@ var registrationData;
 var cachePath;
 var cacheParticipantes;
 
-var modeManual = false;
 var photoURLS = new Array();
 var msgtitle = "VoiceMap";
 var baseMapUrl = "http://serviciosgis.catastrobogota.gov.co/arcgis/rest/services/Mapa_Referencia/Mapa_Base/MapServer";
@@ -97,68 +107,97 @@ function init() {
     } else {
         slogin();
     }
-    initMap();
 }
 
 function initMap() {
     try {
-        dojo.require("esri.map");
-        dojo.require("esri.layers.MapImageLayer");
-        dojo.require("esri.layers.MapImage");
-        dojo.require("esri.graphic");
-        dojo.require("esri.graphicsUtils");
-        dojo.require("esri.symbols.PictureMarkerSymbol");
-        dojo.require("esri.geometry.webMercatorUtils");
-        dojo.addOnLoad(initMap2);
+        require(
+            [
+                "esri/map",
+                "esri/layers/ArcGISTiledMapServiceLayer",
+                "esri/layers/GraphicsLayer",
+                "esri/symbols/PictureMarkerSymbol",
+                "esri/geometry/Point",
+                "esri/geometry/Polyline",
+                "esri/graphic"
+            ], function (
+                __Map,
+                __ArcGISTiledMapServiceLayer,
+                __GraphicsLayer,
+                __PictureMarkerSymbol,
+                __Point,
+                __Polyline,
+                __Graphic) {
+                _Map = __Map;
+                _ArcGISTiledMapServiceLayer = __ArcGISTiledMapServiceLayer;
+                _GraphicsLayer = __GraphicsLayer;
+                _PictureMarkerSymbol = __PictureMarkerSymbol;
+                _Point = __Point;
+                _Polyline = __Polyline;
+                _Graphic = __Graphic;
+                initMap2();
+            });
     } catch (err) {
 
     };
 }
 
 function initMap2() {
-    map = new esri.Map("map", {
+    map = new _Map("map", {
         zoom: 7,
-        center: new esri.geometry.Point(-74.0668084, 4.600885262127369, { wkid: 4686 }),
+        center: new _Point(-74.0668084, 4.600885262127369, { wkid: 4686 }),
+        autoresize: false,
+        slider: false
+    });
+    mapDetalle = new _Map("mapDetalle", {
+        zoom: 7,
+        center: new _Point(-74.0668084, 4.600885262127369, { wkid: 4686 }),
         autoresize: false,
         slider: false
     });
     dojo.connect(map, "onClick", function (evt) {
         if (evt.graphic != null) {
             gotoChat(evt.graphic.attributes.conversacionId);
-        };
-        setLocationPoint(evt);
+        } else {
+            newPoint(evt);
+        }        
     });
-    marker = new esri.symbol.PictureMarkerSymbol();
+    marker = new _PictureMarkerSymbol();
     marker.setHeight(44);
     marker.setWidth(28);
     marker.setUrl("css/Location_Icon.png");
 
-    markerG = new esri.symbol.PictureMarkerSymbol();
+    markerG = new _PictureMarkerSymbol();
     markerG.setHeight(44);
     markerG.setWidth(28);
     markerG.setUrl("css/Marker_Icon.png");
 
-    mapLayer = new esri.layers.ArcGISTiledMapServiceLayer("http://serviciosgis.catastrobogota.gov.co/arcgis/rest/services/Mapa_Referencia/Mapa_Base/MapServer/");
+    mapLayer = new _ArcGISTiledMapServiceLayer("http://serviciosgis.catastrobogota.gov.co/arcgis/rest/services/Mapa_Referencia/Mapa_Base/MapServer/");
     map.addLayer(mapLayer);
-    glPoint = new esri.layers.GraphicsLayer();
+    glPoint = new _GraphicsLayer();
     map.addLayer(glPoint, 0);
-    glPointG = new esri.layers.GraphicsLayer();
+    glPointG = new _GraphicsLayer();
     map.addLayer(glPointG, 0);
+
+    mapLayer2 = new _ArcGISTiledMapServiceLayer("http://serviciosgis.catastrobogota.gov.co/arcgis/rest/services/Mapa_Referencia/Mapa_Base/MapServer/");
+    mapDetalle.addLayer(mapLayer2);
+    glPoint2 = new _GraphicsLayer();
+    mapDetalle.addLayer(glPoint2, 0);
+
     updateSize();
     initLocationGPS();
+    updateUser();
 }
 
 function initLocationGPS() {
-    $("#buttonLocation").css("background-color", "#004167");
-    modeManual = false;
     try {
 
         navigator.geolocation.getCurrentPosition(function (position) {
             currentPointX = position.coords.longitude;
             currentPointY = position.coords.latitude;
-            var currentPoint = new esri.geometry.Point(currentPointX, currentPointY, { wkid: 4686 });
+            currentPoint = new _Point(currentPointX, currentPointY, { wkid: 4686 });
             glPoint.clear();
-            glPoint.add(new esri.Graphic(currentPoint, marker), null, null);
+            glPoint.add(new _Graphic(currentPoint, marker), null, null);
             map.centerAt(currentPoint);
         },
             function (error) {
@@ -179,31 +218,44 @@ function updateSize() {
     };
 };
 
-function setLocation() {
-    if (modeManual) {
-        $("#buttonLocation").css("background-color", "#004167");
-        modeManual = false;
-    } else {
-        $("#buttonLocation").css("background-color", "grey");
-        modeManual = true;
-    }
-};
+function newPoint(evt) {   
+    currentPointX = evt.mapPoint.x;
+    currentPointY = evt.mapPoint.y;
+    var currentPoint = new _Point(currentPointX, currentPointY, { wkid: 4686 });
+    currentChat = null;
+    $("#ftitulo").val("");
+    $("#fdireccion").val("");
+    cacheParticipantes = [];
+    cacheParticipantes.push(currentUser.email);
+    updateParticipantes();
 
-function setLocationPoint(evt) {
-    if (modeManual) {
-        modeManual = false;
-        $("#buttonLocation").css("background-color", "#004167");
-        currentPointX = evt.mapPoint.x;
-        currentPointY = evt.mapPoint.y;
-        var currentPoint = new esri.geometry.Point(currentPointX, currentPointY, { wkid: 4686 });
-        glPoint.clear();
-        glPoint.add(new esri.Graphic(currentPoint, marker), null, null);
-        map.centerAt(currentPoint);
+    var strParticipantes = "";
+    var strId;
+    if (currentChat == null) {
+        strId = new Date().getTime();
+    } else {
+        strId = currentChat;
     }
+    for (var i = 0; i < cacheParticipantes.length; i++) {
+        strParticipantes = strParticipantes + "&participante=" + cacheParticipantes[i];
+    };
+    $.ajax({
+        url: _url_conversacion + "cmd=update&email=" + currentUser.email + "&id=" + strId + "&titulo=" + encodeURIComponent($("#ftitulo").val()) + "&direccion=" + encodeURIComponent($("#fdireccion").val()) + "&latitud=" + currentPointY + "&longitud=" + currentPointX + strParticipantes,
+        type: 'GET',
+        dataType: 'json',
+        success: function (response) {
+            currentChats = response.conversaciones;
+            updateUser();
+            gotoChat(response.id);
+        },
+        error: function () {
+            sendAlert("Error actualizando conversacion.");
+        }
+    });
 }
 
 function hideAll() {
-    $("#mapDiv").css("left", "-6000px");
+    $("#mapDiv").css("left", "-8000px");
     $("#mapDiv").css("position", "absolute");
     $("#map-toolbar").hide();
     $("#speed-dial").hide();
@@ -234,11 +286,11 @@ function slogin() {
                         type: 'GET',
                         dataType: 'json',
                         success: function (response) {
+                            initMap();
                             myApp.hidePreloader();
                             currentChats = response.conversaciones;
                             hideAll();
-                            gotoMap();
-                            updateUser();
+                            gotoMap();                            
                         },
                         error: function () {
                             myApp.hidePreloader();
@@ -261,11 +313,11 @@ function slogin() {
             type: 'GET',
             dataType: 'json',
             success: function (response) {
+                initMap();
                 myApp.hidePreloader();
                 currentChats = response.conversaciones;
                 hideAll();
                 gotoMap();
-                updateUser();
             },
             error: function () {
                 myApp.hidePreloader();
@@ -332,9 +384,6 @@ function gotoMap() {
     $("#map-toolbar").show();
     $("#speed-dial").show();
     updateSize();
-
-    modeManual = false;
-    $("#buttonLocation").css("background-color", "#004167");
 };
 
 function gotoListado() {
@@ -343,17 +392,6 @@ function gotoListado() {
     $("#listadoDiv").show();
     $("#listado-toolbar").show();
 }
-
-function gotonewChat() {
-    currentChat = null;
-    $("#ftitulo").val("");
-    cacheParticipantes = [];
-    cacheParticipantes.push(currentUser.email);
-    updateParticipantes();
-    hideAll();
-    $("#settingsDiv").show();
-    $("#settings-toolbar").show();
-};
 
 function gotoSettings() {
     var currentC = null;
@@ -383,7 +421,7 @@ function acceptSettings() {
         strParticipantes = strParticipantes + "&participante=" + cacheParticipantes[i];
     };
     $.ajax({
-        url: _url_conversacion + "cmd=update&email=" + currentUser.email + "&id=" + strId + "&titulo=" + encodeURIComponent($("#ftitulo").val()) + "&direccion=" + encodeURIComponent($("#fdireccion").val()) + "&latitud=" + currentPointX + "&longitud=" + currentPointY + strParticipantes,
+        url: _url_conversacion + "cmd=update&email=" + currentUser.email + "&id=" + strId + "&titulo=" + encodeURIComponent($("#ftitulo").val()) + "&direccion=" + encodeURIComponent($("#fdireccion").val()) + "&latitud=" + currentPointY + "&longitud=" + currentPointX + strParticipantes,
         type: 'GET',
         dataType: 'json',
         success: function (response) {
@@ -392,7 +430,7 @@ function acceptSettings() {
             gotoChat(response.id);
         },
         error: function () {
-            sendAlert("Error actualizando/creando conversacion.");
+            sendAlert("Error actualizando conversacion.");
         }
     });
 }
@@ -415,6 +453,7 @@ function gotoBack() {
 
 function gotoChat(id) {
     currentChat = id;
+        
     $("#listadoMensajes").html("");
     $.ajax({
         url: _url_conversacion + "cmd=get&conversacionId=" + currentChat,
@@ -458,6 +497,16 @@ function gotoChat(id) {
     $("#chatDiv").show();
     $("#chat-toolbar").show();
     myApp.showToolbar(".toolbar");
+
+    glPoint2.clear();
+    for (var i = 0; i < currentChats.length; i++) {
+        if (currentChats[i].id == id) {
+            var currentPointChat = new _Point(currentChats[i].longitud, currentChats[i].latitud, { wkid: 4686 });
+            glPoint2.add(new _Graphic(currentPointChat, marker), null, null);
+            $("#dirDetalle").html("Direcci&oacute;n (aproximada): " + currentChats[i].direccion);
+            mapDetalle.centerAt(currentPointChat);
+        }
+    }
 }
 
 function sendText() {
@@ -594,7 +643,9 @@ function updateUser() {
     $("#user_name").html(currentUser.displayName);
     $("#user_email").html(currentUser.email);
     $("#listadoConversaciones").html("");
-    var localExtent;
+    glPointG.clear();
+    var puntos = [ currentPoint ];
+
     for (var i = 0; i < currentChats.length; i++) {
         var strHtml = "<li>";
         strHtml = strHtml + "<a href='#' class='item-link item-content' onclick='gotoChat(\"" + currentChats[i].id + "\");'>";
@@ -605,37 +656,30 @@ function updateUser() {
         strHtml = strHtml + "<div class='item-title-row'>";
         strHtml = strHtml + "<div class='item-title'>" + currentChats[i].titulo + "</div>";
         strHtml = strHtml + "</div>";
-        strHtml = strHtml + "<div class='item-subtitle'>" + currentChats[i].direccion + "</div>";
+        strHtml = strHtml + "<div class='item-subtitle'>Direcci&oacute;n:" + currentChats[i].direccion + "</div>";
         //strHtml = strHtml + "<div class='item-text'>Ultimo mensaje: Fecha y texto...</div>";        
         strHtml = strHtml + "</div>";
         strHtml = strHtml + "</a>";
         strHtml = strHtml + "</li>";
         $("#listadoConversaciones").append(strHtml);
 
-
-        glPointG.clear();
         try {
-            var currentPoint = new esri.geometry.Point(currentChats[i].latitud, currentChats[i].longitud, { wkid: 4686 });
-            var currentPointG = new esri.Graphic(currentPoint, markerG);
+            var _currentPoint = new _Point(currentChats[i].longitud, currentChats[i].latitud, { wkid: 4686 });
+            var currentPointG = new _Graphic(_currentPoint, markerG);
+            puntos.push(_currentPoint);
             currentPointG.setAttributes({ conversacionId: currentChats[i].id });
-            glPointG.add(currentPointG, null, null);
-            /*
-            if (localExtent == null) {
-                localExtent = new esri.geometry.Extent(currentPointG.geometry.getExtent());
-            } else {
-                localExtent = localExtent.union(currentPointG.geometry.getExtent());
-            }*/
+            glPointG.add(currentPointG);
         } catch (err) {
 
         }
 
 
     }
-    /*
-    if (localExtent != null) {
-        map.setExtent(localExtent.getExtent());
+    if (puntos.length > 0) {
+        var poly = new _Polyline({ wkid: 4686 });
+        poly.addPath(puntos);
+        map.setExtent(poly.getExtent().expand(1.5));
     }
-    */
 };
 
 function updateParticipantes() {
