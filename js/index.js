@@ -247,6 +247,7 @@ function newPoint(evt) {
             currentChats = response.conversaciones;
             updateUser();
             gotoChat(response.id);
+            sendAudio();
         },
         error: function () {
             sendAlert("Error actualizando conversacion.");
@@ -452,42 +453,44 @@ function gotoBack() {
 };
 
 function gotoChat(id) {
-    currentChat = id;
-        
-    $("#listadoMensajes").html("");
+    if (currentChat != id) {
+        $("#listadoMensajes").html("<br />");
+    };
+    currentChat = id;            
     $.ajax({
         url: _url_conversacion + "cmd=get&conversacionId=" + currentChat,
         type: 'GET',
         dataType: 'json',
         success: function (response) {
-            for (var i = 0; i < response.mensajes.length; i++) {
-                var strHtml = "<div class='card facebook-card'>";
-                strHtml = strHtml + "<div class='card-header no-border'>";
+            for (var i = response.mensajes.length - 1; i >= 0; i--) {
+                if ($("#msg_" + response.mensajes[i].id).length == 0){
+                    var strHtml = "<div id='msg_" + response.mensajes[i].id + "' class='card facebook-card'>";
+                    strHtml = strHtml + "<div class='card-header no-border'>";
 
-                var strUser = null;
-                for (var j = 0; j < response.usuarios.length; j++) {
-                    if (response.mensajes[i].email == response.usuarios[j].email) {
-                        strUser = response.usuarios[j];
+                    var strUser = null;
+                    for (var j = 0; j < response.usuarios.length; j++) {
+                        if (response.mensajes[i].email == response.usuarios[j].email) {
+                            strUser = response.usuarios[j];
+                        }
                     }
-                }
 
-                if (strUser == null) {
-                    strHtml = strHtml + "<div class='facebook-avatar'><img src='images/Profile.jpg' width='34' height='34'></div>";
-                    strHtml = strHtml + "<div class='facebook-name'>" + response.mensajes[i].email + "</div>";
-                } else {
-                    strHtml = strHtml + "<div class='facebook-avatar'><img src='" + strUser.imageUrl + "' width='34' height='34'></div>";
-                    strHtml = strHtml + "<div class='facebook-name'>" + strUser.displayName + "</div>";
-                }
+                    if (strUser == null) {
+                        strHtml = strHtml + "<div class='facebook-avatar'><img src='images/Profile.jpg' width='34' height='34'></div>";
+                        strHtml = strHtml + "<div class='facebook-name'>" + response.mensajes[i].email + "</div>";
+                    } else {
+                        strHtml = strHtml + "<div class='facebook-avatar'><img src='" + strUser.imageUrl + "' width='34' height='34'></div>";
+                        strHtml = strHtml + "<div class='facebook-name'>" + strUser.displayName + "</div>";
+                    }
 
-                strHtml = strHtml + "<div class='facebook-date'>" + response.mensajes[i].timestamp + "</div>";
-                strHtml = strHtml + "</div>";
-                strHtml = strHtml + "<div class='card-content'>";
-                strHtml = strHtml + response.mensajes[i].contenido;
-                strHtml = strHtml + "</div>";
-                strHtml = strHtml + "</div>";
-                $("#listadoMensajes").append(strHtml);
+                    strHtml = strHtml + "<div class='facebook-date'>" + response.mensajes[i].timestamp + "</div>";
+                    strHtml = strHtml + "</div>";
+                    strHtml = strHtml + "<div class='card-content'>";
+                    strHtml = strHtml + response.mensajes[i].contenido;
+                    strHtml = strHtml + "</div>";
+                    strHtml = strHtml + "</div>";
+                    $("#listadoMensajes").prepend(strHtml);
+                }
             }
-            $("#listadoMensajes").append("<br />");
         },
         error: function () {
             sendAlert("Error en el inicio de session.");
