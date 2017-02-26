@@ -218,7 +218,8 @@ function updateSize() {
     };
 };
 
-function newPoint(evt) {   
+function newPoint(evt) {
+    myApp.showPreloader('Ubicando punto...');
     currentPointX = evt.mapPoint.x;
     currentPointY = evt.mapPoint.y;
     var currentPoint = new _Point(currentPointX, currentPointY, { wkid: 4686 });
@@ -244,6 +245,7 @@ function newPoint(evt) {
         type: 'GET',
         dataType: 'json',
         success: function (response) {
+            myApp.hidePreloader();
             currentChats = response.conversaciones;
             updateUser();
             gotoChat(response.id);
@@ -347,11 +349,11 @@ function login() {
                         type: 'GET',
                         dataType: 'json',
                         success: function (response) {
+                            initMap();
                             myApp.hidePreloader();
                             currentChats = response.conversaciones;
                             hideAll();
                             gotoMap();
-                            updateUser();
                         },
                         error: function () {
                             myApp.hidePreloader();
