@@ -673,7 +673,7 @@ function dial() {
 };
 
 function nuevoParticipante() {
-    myApp.prompt('Correo del nuevo participante?', 'VoiceMap', function (value) {
+    myApp.prompt('Correo del nuevo participante', 'VoiceMap', function (value) {
         cacheParticipantes.push(value);
         updateParticipantes();
     });
