@@ -24,10 +24,15 @@ var _PictureMarkerSymbol;
 var _Point;
 var _Polyline;
 var _Graphic;
+var _screenUtils;
+var _webMercatorUtils;
+var _Hammer;
 
 var currentPointX;
 var currentPointY;
 var currentPoint;
+var currentPointChat;
+
 var currentUser;
 var currentChats;
 var currentChat;
@@ -119,7 +124,10 @@ function initMap() {
                 "esri/symbols/PictureMarkerSymbol",
                 "esri/geometry/Point",
                 "esri/geometry/Polyline",
-                "esri/graphic"
+                "esri/graphic",
+                "esri/geometry/screenUtils",
+                "esri/geometry/webMercatorUtils",
+                "hammer"
             ], function (
                 __Map,
                 __ArcGISTiledMapServiceLayer,
@@ -127,7 +135,10 @@ function initMap() {
                 __PictureMarkerSymbol,
                 __Point,
                 __Polyline,
-                __Graphic) {
+                __Graphic,
+                __screenUtils,
+                __webMercatorUtils,
+                __Hammer) {
                 _Map = __Map;
                 _ArcGISTiledMapServiceLayer = __ArcGISTiledMapServiceLayer;
                 _GraphicsLayer = __GraphicsLayer;
@@ -135,6 +146,9 @@ function initMap() {
                 _Point = __Point;
                 _Polyline = __Polyline;
                 _Graphic = __Graphic;
+                _screenUtils = __screenUtils;
+                _webMercatorUtils = __webMercatorUtils;
+                _Hammer = __Hammer;
                 initMap2();
             });
     } catch (err) {
@@ -155,13 +169,31 @@ function initMap2() {
         autoresize: false,
         slider: false
     });
+    mapDetalle.on("update-end", function (evt) {
+        if (currentPointChat != null) {
+            mapDetalle.centerAt(currentPointChat);
+        }
+    });
     dojo.connect(map, "onClick", function (evt) {
         if (evt.graphic != null) {
-            gotoChat(evt.graphic.attributes.conversacionId);
-        } else {
-            newPoint(evt);
+            gotoChat(evt.graphic.attributes.conversacionId);           
         }        
     });
+    var hammertime = _Hammer(document.getElementById('map'));
+    hammertime.on("hold", function (evt) {
+        var x, y, point, mapPoint;
+        x = evt.gesture.center.pageX;
+        y = evt.gesture.center.pageY;
+        point = new _Point(x, y);
+        mapPoint = _screenUtils.toMapPoint(
+          map.extent,
+          map.width,
+          map.height,
+          point
+        );
+        newPoint(mapPoint);
+    });
+
     marker = new _PictureMarkerSymbol();
     marker.setHeight(44);
     marker.setWidth(28);
@@ -220,8 +252,8 @@ function updateSize() {
 
 function newPoint(evt) {
     myApp.showPreloader('Ubicando punto...');
-    currentPointX = evt.mapPoint.x;
-    currentPointY = evt.mapPoint.y;
+    currentPointX = evt.x;
+    currentPointY = evt.y;
     var currentPoint = new _Point(currentPointX, currentPointY, { wkid: 4686 });
     currentChat = null;
     $("#ftitulo").val("");
@@ -293,7 +325,8 @@ function slogin() {
                             myApp.hidePreloader();
                             currentChats = response.conversaciones;
                             hideAll();
-                            gotoMap();                            
+                            gotoMap();
+                            zoomPoints();
                         },
                         error: function () {
                             myApp.hidePreloader();
@@ -321,6 +354,7 @@ function slogin() {
                 currentChats = response.conversaciones;
                 hideAll();
                 gotoMap();
+                zoomPoints();
             },
             error: function () {
                 myApp.hidePreloader();
@@ -354,6 +388,7 @@ function login() {
                             currentChats = response.conversaciones;
                             hideAll();
                             gotoMap();
+                            zoomPoints();
                         },
                         error: function () {
                             myApp.hidePreloader();
@@ -458,7 +493,16 @@ function gotoChat(id) {
     if (currentChat != id) {
         $("#listadoMensajes").html("<br />");
     };
-    currentChat = id;            
+    currentChat = id;
+    glPoint2.clear();
+    for (var i = 0; i < currentChats.length; i++) {
+        if (currentChats[i].id == id) {
+            currentPointChat = new _Point(currentChats[i].longitud, currentChats[i].latitud, { wkid: 4686 });
+            glPoint2.add(new _Graphic(currentPointChat, markerG), null, null);
+            $("#dirDetalle").html("Direcci&oacute;n (aproximada): " + currentChats[i].direccion);
+            mapDetalle.centerAt(currentPointChat);
+        }
+    }
     $.ajax({
         url: _url_conversacion + "cmd=get&conversacionId=" + currentChat,
         type: 'GET',
@@ -493,6 +537,7 @@ function gotoChat(id) {
                     $("#listadoMensajes").prepend(strHtml);
                 }
             }
+            mapDetalle.centerAt(currentPointChat);
         },
         error: function () {
             sendAlert("Error en el inicio de session.");
@@ -502,16 +547,6 @@ function gotoChat(id) {
     $("#chatDiv").show();
     $("#chat-toolbar").show();
     myApp.showToolbar(".toolbar");
-
-    glPoint2.clear();
-    for (var i = 0; i < currentChats.length; i++) {
-        if (currentChats[i].id == id) {
-            var currentPointChat = new _Point(currentChats[i].longitud, currentChats[i].latitud, { wkid: 4686 });
-            glPoint2.add(new _Graphic(currentPointChat, marker), null, null);
-            $("#dirDetalle").html("Direcci&oacute;n (aproximada): " + currentChats[i].direccion);
-            mapDetalle.centerAt(currentPointChat);
-        }
-    }
 }
 
 function sendText() {
@@ -679,6 +714,19 @@ function updateUser() {
         }
 
 
+    }
+};
+
+function zoomPoints() {
+    var puntos = [currentPoint];
+
+    for (var i = 0; i < currentChats.length; i++) {        
+        try {
+            var _currentPoint = new _Point(currentChats[i].longitud, currentChats[i].latitud, { wkid: 4686 });
+            puntos.push(_currentPoint);
+        } catch (err) {
+
+        }
     }
     if (puntos.length > 0) {
         var poly = new _Polyline({ wkid: 4686 });
