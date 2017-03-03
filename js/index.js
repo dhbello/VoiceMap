@@ -25,7 +25,9 @@ var _Point;
 var _Polyline;
 var _Graphic;
 var _screenUtils;
+var _scaleUtils;
 var _webMercatorUtils;
+var _geometryEngine;
 var _Hammer;
 
 var currentPointX;
@@ -43,7 +45,7 @@ var cacheParticipantes;
 
 var photoURLS = new Array();
 var msgtitle = "VoiceMap";
-var baseMapUrl = "http://serviciosgis.catastrobogota.gov.co/arcgis/rest/services/Mapa_Referencia/Mapa_Base/MapServer";
+var baseMapUrl = "http://serviciosgis.eastus.cloudapp.azure.com/arcgis/rest/services/Mapa_Referencia/mapa_base_3857/MapServer";
 
 var _url_registro = 'https://voicemap-153216.appspot.com/Registro?';
 var _url_conversacion = 'https://voicemap-153216.appspot.com/Conversacion?';
@@ -122,10 +124,12 @@ function initMap() {
                 "esri/layers/ArcGISTiledMapServiceLayer",
                 "esri/layers/GraphicsLayer",
                 "esri/symbols/PictureMarkerSymbol",
+                "esri/geometry/geometryEngine",
                 "esri/geometry/Point",
                 "esri/geometry/Polyline",
                 "esri/graphic",
                 "esri/geometry/screenUtils",
+                "esri/geometry/scaleUtils",
                 "esri/geometry/webMercatorUtils",
                 "hammer"
             ], function (
@@ -133,20 +137,24 @@ function initMap() {
                 __ArcGISTiledMapServiceLayer,
                 __GraphicsLayer,
                 __PictureMarkerSymbol,
+                __geometryEngine,
                 __Point,
                 __Polyline,
                 __Graphic,
                 __screenUtils,
+                __scaleUtils,
                 __webMercatorUtils,
                 __Hammer) {
                 _Map = __Map;
                 _ArcGISTiledMapServiceLayer = __ArcGISTiledMapServiceLayer;
                 _GraphicsLayer = __GraphicsLayer;
                 _PictureMarkerSymbol = __PictureMarkerSymbol;
+                _geometryEngine = __geometryEngine;
                 _Point = __Point;
                 _Polyline = __Polyline;
                 _Graphic = __Graphic;
                 _screenUtils = __screenUtils;
+                _scaleUtils = __scaleUtils;
                 _webMercatorUtils = __webMercatorUtils;
                 _Hammer = __Hammer;
                 initMap2();
@@ -158,14 +166,14 @@ function initMap() {
 
 function initMap2() {
     map = new _Map("map", {
-        zoom: 7,
-        center: new _Point(-74.0668084, 4.600885262127369, { wkid: 4686 }),
+        zoom: 14,
+        center: new _Point(-74.0668084, 4.600885262127369),
         autoresize: false,
         slider: false
     });
     mapDetalle = new _Map("mapDetalle", {
-        zoom: 7,
-        center: new _Point(-74.0668084, 4.600885262127369, { wkid: 4686 }),
+        zoom: 14,
+        center: new _Point(-74.0668084, 4.600885262127369),
         autoresize: false,
         slider: false
     });
@@ -204,14 +212,14 @@ function initMap2() {
     markerG.setWidth(28);
     markerG.setUrl("css/Marker_Icon.png");
 
-    mapLayer = new _ArcGISTiledMapServiceLayer("http://serviciosgis.catastrobogota.gov.co/arcgis/rest/services/Mapa_Referencia/Mapa_Base/MapServer/");
+    mapLayer = new _ArcGISTiledMapServiceLayer(baseMapUrl);
     map.addLayer(mapLayer);
     glPoint = new _GraphicsLayer();
     map.addLayer(glPoint, 0);
     glPointG = new _GraphicsLayer();
     map.addLayer(glPointG, 0);
 
-    mapLayer2 = new _ArcGISTiledMapServiceLayer("http://serviciosgis.catastrobogota.gov.co/arcgis/rest/services/Mapa_Referencia/Mapa_Base/MapServer/");
+    mapLayer2 = new _ArcGISTiledMapServiceLayer(baseMapUrl);
     mapDetalle.addLayer(mapLayer2);
     glPoint2 = new _GraphicsLayer();
     mapDetalle.addLayer(glPoint2, 0);
@@ -219,6 +227,7 @@ function initMap2() {
     updateSize();
     initLocationGPS();
     updateUser();
+    zoomPoints();
 }
 
 function initLocationGPS() {
@@ -227,10 +236,13 @@ function initLocationGPS() {
         navigator.geolocation.getCurrentPosition(function (position) {
             currentPointX = position.coords.longitude;
             currentPointY = position.coords.latitude;
-            currentPoint = new _Point(currentPointX, currentPointY, { wkid: 4686 });
+            currentPoint = new _Point(currentPointX, currentPointY);
             glPoint.clear();
             glPoint.add(new _Graphic(currentPoint, marker), null, null);
             map.centerAt(currentPoint);
+            if (currentChats != null) {
+                updateUser();
+            }
         },
             function (error) {
 
@@ -252,9 +264,9 @@ function updateSize() {
 
 function newPoint(evt) {
     myApp.showPreloader('Ubicando punto...');
-    currentPointX = evt.x;
-    currentPointY = evt.y;
-    var currentPoint = new _Point(currentPointX, currentPointY, { wkid: 4686 });
+    var currentPoint = _webMercatorUtils.webMercatorToGeographic(new _Point(evt.x, evt.y));
+    currentPointX = currentPoint.x;
+    currentPointY = currentPoint.y;
     currentChat = null;
     $("#ftitulo").val("");
     $("#fdireccion").val("");
@@ -326,7 +338,6 @@ function slogin() {
                             currentChats = response.conversaciones;
                             hideAll();
                             gotoMap();
-                            zoomPoints();
                         },
                         error: function () {
                             myApp.hidePreloader();
@@ -354,7 +365,6 @@ function slogin() {
                 currentChats = response.conversaciones;
                 hideAll();
                 gotoMap();
-                zoomPoints();
             },
             error: function () {
                 myApp.hidePreloader();
@@ -388,7 +398,6 @@ function login() {
                             currentChats = response.conversaciones;
                             hideAll();
                             gotoMap();
-                            zoomPoints();
                         },
                         error: function () {
                             myApp.hidePreloader();
@@ -438,6 +447,11 @@ function gotoSettings() {
             currentC = currentChats[i];
         };
     };
+    if (currentC.owner == currentUser.email) {
+        $("#btnDeleteConversacion").show();
+    } else {
+        $("#btnDeleteConversacion").hide();
+    }
     $("#ftitulo").val(currentC.titulo);
     $("#fdireccion").val(currentC.direccion);
     cacheParticipantes = currentC.participantes.slice();
@@ -459,7 +473,7 @@ function acceptSettings() {
         strParticipantes = strParticipantes + "&participante=" + cacheParticipantes[i];
     };
     $.ajax({
-        url: _url_conversacion + "cmd=update&email=" + currentUser.email + "&id=" + strId + "&titulo=" + encodeURIComponent($("#ftitulo").val()) + "&direccion=" + encodeURIComponent($("#fdireccion").val()) + "&latitud=" + currentPointY + "&longitud=" + currentPointX + strParticipantes,
+        url: _url_conversacion + "cmd=update&email=" + currentUser.email + "&id=" + strId + "&titulo=" + encodeURIComponent($("#ftitulo").val()) + "&direccion=" + encodeURIComponent($("#fdireccion").val()) + /*"&latitud=" + currentPointY + "&longitud=" + currentPointX +*/ strParticipantes,
         type: 'GET',
         dataType: 'json',
         success: function (response) {
@@ -497,7 +511,7 @@ function gotoChat(id) {
     glPoint2.clear();
     for (var i = 0; i < currentChats.length; i++) {
         if (currentChats[i].id == id) {
-            currentPointChat = new _Point(currentChats[i].longitud, currentChats[i].latitud, { wkid: 4686 });
+            currentPointChat = new _Point(currentChats[i].longitud, currentChats[i].latitud);
             glPoint2.add(new _Graphic(currentPointChat, markerG), null, null);
             $("#dirDetalle").html("Direcci&oacute;n (aproximada): " + currentChats[i].direccion);
             mapDetalle.centerAt(currentPointChat);
@@ -673,10 +687,13 @@ function dial() {
 };
 
 function nuevoParticipante() {
-    myApp.prompt('Correo del nuevo participante', 'VoiceMap', function (value) {
-        cacheParticipantes.push(value);
-        updateParticipantes();
+    myApp.prompt('', 'Nuevo participante', function (value) {
+        if (value != "") {
+            cacheParticipantes.push(value);
+            updateParticipantes();
+        }
     });
+    $(".modal-in :input").attr("placeholder", "Correo electronico");    
 };
 
 function updateUser() {
@@ -685,6 +702,30 @@ function updateUser() {
     $("#listadoConversaciones").html("");
     glPointG.clear();
     var puntos = [ currentPoint ];
+
+    if ($("#btnSortDate").hasClass("button-fill")) {
+        currentChats.sort(function (a, b) {
+            if (new Date(a.timestamp) < new Date(b.timestamp)) return 1;
+            if (new Date(a.timestamp) > new Date(b.timestamp)) return -1;
+            return 0;
+        });
+    }
+    if ($("#btnSortTitle").hasClass("button-fill")) {
+        currentChats.sort(function (a, b) {
+            if (a.titulo < b.titulo) return -1;
+            if (a.titulo > b.titulo) return 1;
+            return 0;
+        });
+    }
+    if ($("#btnSortDistance").hasClass("button-fill")) {
+        currentChats.sort(function (a, b) {
+            var d1 = _geometryEngine.distance(currentPoint, new _Point(a.longitud, a.latitud));
+            var d2 = _geometryEngine.distance(currentPoint, new _Point(b.longitud, b.latitud));
+            if (d1 < d2) return -1;
+            if (d1 > d2) return 1;
+            return 0;
+        });
+    }
 
     for (var i = 0; i < currentChats.length; i++) {
         var strHtml = "<li>";
@@ -697,14 +738,18 @@ function updateUser() {
         strHtml = strHtml + "<div class='item-title'>" + currentChats[i].titulo + "</div>";
         strHtml = strHtml + "</div>";
         strHtml = strHtml + "<div class='item-subtitle'>Direcci&oacute;n:" + currentChats[i].direccion + "</div>";
-        //strHtml = strHtml + "<div class='item-text'>Ultimo mensaje: Fecha y texto...</div>";        
+        strHtml = strHtml + "<div class='item-text'>" + currentChats[i].timestamp + "</div>";
+        if (currentPoint != null) {
+            var distancia = (_geometryEngine.distance(currentPoint, new _Point(currentChats[i].longitud, currentChats[i].latitud)) * _scaleUtils.getUnitValueForSR({ wkid: 4326 })) / 1000;
+            strHtml = strHtml + "<div class='item-text'>Distancia: " + distancia.toFixed(1) + " Kms.</div>";
+        }
         strHtml = strHtml + "</div>";
         strHtml = strHtml + "</a>";
         strHtml = strHtml + "</li>";
         $("#listadoConversaciones").append(strHtml);
 
         try {
-            var _currentPoint = new _Point(currentChats[i].longitud, currentChats[i].latitud, { wkid: 4686 });
+            var _currentPoint = new _Point(currentChats[i].longitud, currentChats[i].latitud);
             var currentPointG = new _Graphic(_currentPoint, markerG);
             puntos.push(_currentPoint);
             currentPointG.setAttributes({ conversacionId: currentChats[i].id });
@@ -722,14 +767,14 @@ function zoomPoints() {
 
     for (var i = 0; i < currentChats.length; i++) {        
         try {
-            var _currentPoint = new _Point(currentChats[i].longitud, currentChats[i].latitud, { wkid: 4686 });
+            var _currentPoint = new _Point(currentChats[i].longitud, currentChats[i].latitud);
             puntos.push(_currentPoint);
         } catch (err) {
 
         }
     }
     if (puntos.length > 0) {
-        var poly = new _Polyline({ wkid: 4686 });
+        var poly = new _Polyline();
         poly.addPath(puntos);
         map.setExtent(poly.getExtent().expand(1.5));
     }
@@ -753,9 +798,52 @@ function updateParticipantes() {
     };
 };
 
+function sortByDate() {
+    $("#btnSortDate,#btnSortTitle,#btnSortDistance").removeClass("button-fill");
+    $("#btnSortTitle,#btnSortDistance").addClass("button-raised");
+    $("#btnSortDate").addClass("button-fill");
+    updateUser();
+};
+
+function sortByTitle() {
+    $("#btnSortDate,#btnSortTitle,#btnSortDistance").removeClass("button-fill");
+    $("#btnSortDate,#btnSortDistance").addClass("button-raised");
+    $("#btnSortTitle").addClass("button-fill");    
+    updateUser();
+};
+
+function sortByDistance() {
+    $("#btnSortDate,#btnSortTitle,#btnSortDistance").removeClass("button-fill");
+    $("#btnSortDate,#btnSortTitle").addClass("button-raised");
+    $("#btnSortDistance").addClass("button-fill");    
+    updateUser();
+};
+
 function deleteParticipante(pos) {
     cacheParticipantes.splice(pos, 1);
     updateParticipantes();
+}
+
+function deleteConversacion() {
+    myApp.confirm('Esta seguro de eliminar la conversaci&oacute;n?', '', function () {
+        myApp.showPreloader('Eliminado conversaci&oacute;n...');
+        $.ajax({
+            url: _url_conversacion + "cmd=delete&email=" + currentUser.email + "&id=" + currentChat,
+            type: 'GET',
+            dataType: 'json',
+            success: function (response) {
+                myApp.hidePreloader();
+                currentChats = response.conversaciones;
+                updateUser();
+                gotoListado();
+            },
+            error: function () {
+                sendAlert("Error actualizando conversacion.");
+            }
+        });
+
+
+    });
 }
 
 function logout() {
