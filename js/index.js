@@ -296,6 +296,7 @@ function newPoint(evt) {
             sendAudio();
         },
         error: function () {
+            myApp.hidePreloader();
             sendAlert("Error actualizando conversacion.");
         }
     });
@@ -835,6 +836,7 @@ function deleteConversacion() {
                 gotoListado();
             },
             error: function () {
+                myApp.hidePreloader();
                 sendAlert("Error actualizando conversacion.");
             }
         });
