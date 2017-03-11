@@ -17,6 +17,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="format-detection" content="telephone=no">
     <meta name="msapplication-tap-highlight" content="no">
+    <meta name="google-signin-scope" content="profile email">
+    <meta name="google-signin-client_id" content="394219421908-hsc5q45ah24ppo7i2bhhga2cc1k3nncb.apps.googleusercontent.com">
+    <!--<script src="https://apis.google.com/js/platform.js" async defer></script>-->
     <title>VoiceMap</title>
     <link rel="stylesheet" href="lib/framework7/css/framework7.material.min.css">
     <link rel="stylesheet" href="lib/framework7/css/framework7.material.colors.min.css">
@@ -61,15 +64,6 @@
                     <div class="center navcenter">VoiceMap</div>
                     <div class="right">
                         <a href="#" class="link"></a>
-                    </div>
-                </div>
-                <div class="navbar-inner" id="registro-toolbar" style="display: none;">
-                    <div class="left">
-                        <a href="#" onclick="gotoLogin();" class="link"><i class="fa fa-chevron-left" aria-hidden="true"></i></a>
-                    </div>
-                    <div class="center navcenter">VoiceMap</div>
-                    <div class="right">
-                        <a href="#" onclick="submitRegistro();" class="link">Continuar</a>
                     </div>
                 </div>
                 <div class="navbar-inner" id="listado-toolbar" style="display: none;">
@@ -117,7 +111,11 @@
                                     <br />
                                     <img src="images/Patrocinador_Alcaldia.png" style="width: 100%;" />
                                     <br />
-                                    <a href="#" class="button button-fill button-raised" onclick="login();" style="width: 100%;">Iniciar Sesion</a>
+                                    <div id="my-signin2" class="left" style="display: none;">
+                                    </div>
+                                    <div id="my-signin" class="left" style="display: none;">
+                                        <a href="#" class="button button-fill button-raised" onclick="login();" style="width: 100%;">Iniciar Sesion</a>
+                                    </div>
                                 </div>
                             </div>
                             <div id="mapDiv"
@@ -142,7 +140,7 @@
                                 <div class="content-block">
                                     <div class="list-block media-list">
                                         <ul id="listadoConversaciones">
-                                            
+
                                         </ul>
                                     </div>
                                 </div>
@@ -154,7 +152,7 @@
                                     <div id="dirDetalle"></div>
                                 </div>
                                 <div class="content-block" id="listadoMensajes">
-                                    
+
                                 </div>
                             </div>
                             <div id="settingsDiv" style="display: none;">
@@ -184,7 +182,7 @@
                                     <div class="content-block-title">Participantes</div>
                                     <div class="list-block media-list">
                                         <ul id="listadoParticipantes">
-                                            
+
                                         </ul>
                                     </div>
                                     <a href="#" onclick="nuevoParticipante();" class="button button-fill">Nuevo participante</a>
@@ -203,7 +201,7 @@
     <script type="text/javascript" src="lib/framework7/js/framework7.min.js"></script>
     <script type="text/javascript" src="arcgis/dojo/dojo.js"></script>
     <script type="text/javascript" src="js/index.js"></script>
-    
+
     <!--<script src="https://js.arcgis.com/3.19/"></script>-->
 
 </body>

@@ -112,7 +112,16 @@ function init() {
             alert(err);
         }
     } else {
-        slogin();
+        gapi.signin2.render('my-signin2', {
+            'scope': 'profile email',
+            'height': 50,
+            'width': 'auto',
+            'longtitle': true,
+            'theme': 'dark',
+            'onsuccess': onLoginSuccess,
+            'onfailure': onLoginFailure
+        });
+
     }
 }
 
@@ -351,28 +360,7 @@ function slogin() {
                     myApp.hidePreloader();
                 }
              );
-    } else {
-        currentUser = { idToken: null, registrationId: null }
-        var registroURL = _url_registro + "idToken=" + currentUser.idToken + "&registrationId=" + registrationId;
-        $.ajax({
-            url: registroURL,
-            type: 'GET',
-            dataType: 'json',
-            success: function (response) {
-                initMap();
-                myApp.hidePreloader();
-                currentChats = response.conversaciones;
-                hideAll();
-                gotoMap();
-            },
-            error: function () {
-                myApp.hidePreloader();
-                setTimeout(function () {
-                    sendAlert("Error en el inicio de session.");
-                }, 1500);
-            }
-        });
-    }
+    };
 }
 
 function login() {
@@ -415,7 +403,41 @@ function login() {
     };
 };
 
+function onLoginSuccess(googleUser) {
+    console.log('Logged in as: ' + googleUser.getBasicProfile().getName());
+    currentUser = { email: googleUser.getBasicProfile().getEmail(), idToken: googleUser.getAuthResponse().id_token, registrationId: null }
+    var registroURL = _url_registro + "idToken=" + currentUser.idToken + "&registrationId=" + currentUser.registrationId;
+    $.ajax({
+        url: registroURL,
+        type: 'GET',
+        dataType: 'json',
+        success: function (response) {
+            initMap();
+            myApp.hidePreloader();
+            currentChats = response.conversaciones;
+            hideAll();
+            gotoMap();
+        },
+        error: function () {
+            myApp.hidePreloader();
+            setTimeout(function () {
+                sendAlert("Error en el inicio de session.");
+            }, 1500);
+        }
+    });
+}
+function onLoginFailure(error) {
+    sendAlert("Error en el inicio de session.");
+}
+
 function gotoLogin() {
+    if (isPhoneGapExclusive()) {
+        $("#my-signin2").hide();
+        $("#my-signin").show();
+    } else {
+        $("#my-signin").hide();
+        $("#my-signin2").show();
+    }
     hideAll();
     $("#loginDiv").show();
     $("#login-toolbar").show();
@@ -858,8 +880,11 @@ function logout() {
             }
         );
     } else {
-        currentUser = null;
-        gotoLogin();
+        var auth2 = gapi.auth2.getAuthInstance();
+        auth2.signOut().then(function () {
+            currentUser = null;
+            gotoLogin();
+        });
     }
 };
 
