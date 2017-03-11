@@ -302,7 +302,9 @@ function newPoint(evt) {
             currentChats = response.conversaciones;
             updateUser();
             gotoChat(response.id);
-            sendAudio();
+            if (isPhoneGapExclusive()) {
+                sendAudio();
+            }
         },
         error: function () {
             myApp.hidePreloader();
@@ -580,6 +582,13 @@ function gotoChat(id) {
     hideAll();
     $("#chatDiv").show();
     $("#chat-toolbar").show();
+    if (isPhoneGapExclusive()) {
+        $("#btnSendPhoto").show();
+        $("#btnSendAudio").show();
+    } else {
+        $("#btnSendPhoto").hide();
+        $("#btnSendAudio").hide();
+    }
     myApp.showToolbar(".toolbar");
 }
 
