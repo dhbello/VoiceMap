@@ -285,7 +285,7 @@ function newPoint(evt) {
         strParticipantes = strParticipantes + "&participante=" + cacheParticipantes[i];
     };
     $.ajax({
-        url: _url_conversacion + "cmd=update&email=" + currentUser.email + "&id=" + strId + "&titulo=" + encodeURIComponent($("#ftitulo").val()) + "&direccion=" + encodeURIComponent($("#fdireccion").val()) + "&latitud=" + currentPointY + "&longitud=" + currentPointX + strParticipantes,
+        url: _url_conversacion + "cmd=update&idToken=" + currentUser.idToken + "&id=" + strId + "&titulo=" + encodeURIComponent($("#ftitulo").val()) + "&direccion=" + encodeURIComponent($("#fdireccion").val()) + "&latitud=" + currentPointY + "&longitud=" + currentPointX + strParticipantes,
         type: 'GET',
         dataType: 'json',
         success: function (response) {
@@ -326,8 +326,7 @@ function slogin() {
                     myApp.showPreloader('Iniciando sesi&oacute;n');
                     obj.registrationId = registrationData;
                     currentUser = obj;
-                    var registroURL = _url_registro + "email=" + encodeURIComponent(currentUser.email)
-                      + "&userId=" + currentUser.userId + "&displayName=" + encodeURIComponent(currentUser.displayName) + "&imageUrl=" + encodeURIComponent(currentUser.imageUrl) + "&registrationId=" + encodeURIComponent(currentUser.registrationId);
+                    var registroURL = _url_registro + "idToken=" + currentUser.idToken + "&registrationId=" + encodeURIComponent(currentUser.registrationId);
                     $.ajax({
                         url: registroURL,
                         type: 'GET',
@@ -352,9 +351,8 @@ function slogin() {
                 }
              );
     } else {
-        currentUser = { userId: 109917423592778214535, email: "dbello@catastrobogota.gov.co", displayName: "David Hernando Bello Ladino", imageUrl: "https://lh4.googleusercontent.com/-yrsxwsfx9jQ/AAAAAAAAAAI/AAAAAAAAAAk/dBZAfoGLEU8/photo.jpg", registrationId: null }
-        var registroURL = _url_registro + "email=" + encodeURIComponent(currentUser.email)
-          + "&userId=" + currentUser.userId + "&displayName=" + encodeURIComponent(currentUser.displayName) + "&imageUrl=" + encodeURIComponent(currentUser.imageUrl) + "&registrationId=" + encodeURIComponent(currentUser.registrationId);
+        currentUser = { idToken: null, registrationId: null }
+        var registroURL = _url_registro + "idToken=" + currentUser.idToken + "&registrationId=" + registrationId;
         $.ajax({
             url: registroURL,
             type: 'GET',
@@ -386,8 +384,7 @@ function login() {
                 function (obj) {
                     obj.registrationId = registrationData;
                     currentUser = obj;
-                    var registroURL = _url_registro + "email=" + encodeURIComponent(currentUser.email)
-                      + "&userId=" + currentUser.userId + "&displayName=" + encodeURIComponent(currentUser.displayName) + "&imageUrl=" + encodeURIComponent(currentUser.imageUrl) + "&registrationId=" + encodeURIComponent(currentUser.registrationId);
+                    var registroURL = _url_registro + "idToken=" + currentUser.idToken + "&registrationId=" + encodeURIComponent(currentUser.registrationId);
                     $.ajax({
                         url: registroURL,
                         type: 'GET',
@@ -473,7 +470,7 @@ function acceptSettings() {
         strParticipantes = strParticipantes + "&participante=" + cacheParticipantes[i];
     };
     $.ajax({
-        url: _url_conversacion + "cmd=update&email=" + currentUser.email + "&id=" + strId + "&titulo=" + encodeURIComponent($("#ftitulo").val()) + "&direccion=" + encodeURIComponent($("#fdireccion").val()) + /*"&latitud=" + currentPointY + "&longitud=" + currentPointX +*/ strParticipantes,
+        url: _url_conversacion + "cmd=update&idToken=" + currentUser.idToken + "&id=" + strId + "&titulo=" + encodeURIComponent($("#ftitulo").val()) + "&direccion=" + encodeURIComponent($("#fdireccion").val()) + /*"&latitud=" + currentPointY + "&longitud=" + currentPointX +*/ strParticipantes,
         type: 'GET',
         dataType: 'json',
         success: function (response) {
@@ -518,7 +515,7 @@ function gotoChat(id) {
         }
     }
     $.ajax({
-        url: _url_conversacion + "cmd=get&conversacionId=" + currentChat,
+        url: _url_conversacion + "cmd=get&idToken=" + currentUser.idToken + "&conversacionId=" + currentChat,
         type: 'GET',
         dataType: 'json',
         success: function (response) {
@@ -567,7 +564,7 @@ function sendText() {
     var strTxt = $("#txtMsg").val();
     $("#txtMsg").val("");
     $.ajax({
-        url: _url_mensajes + "cmd=create&conversacionId=" + currentChat + "&id=" + new Date().getTime() + "&email=" + encodeURIComponent(currentUser.email) + "&contenido=" + strTxt,
+        url: _url_mensajes + "cmd=create&idToken=" + currentUser.idToken + "&conversacionId=" + currentChat + "&id=" + new Date().getTime() + "&contenido=" + strTxt,
         type: 'GET',
         dataType: 'json',
         success: function (response) {
@@ -614,7 +611,7 @@ function captureAudioSuccess(audioURI) {
     options.fileKey = "nva_audio";
     options.fileName = "audio_" + new Date().getTime();
     ft = new FileTransfer();
-    ft.upload(audioURI[0].localURL, _url_audio + "filename=" + audioURI[0].localURL + "&conversacionId=" + currentChat + "&id=" + new Date().getTime() + "&email=" + encodeURIComponent(currentUser.email), uploadAudioSuccessFT, uploadAudioFail, options);
+    ft.upload(audioURI[0].localURL, _url_audio + "filename=" + audioURI[0].localURL + "&conversacionId=" + currentChat + "&id=" + new Date().getTime() + "&idToken=" + currentUser.idToken, uploadAudioSuccessFT, uploadAudioFail, options);
 }
 
 function captureAudioFail(audioURI) {
@@ -656,7 +653,7 @@ function captureImagenSuccess(imageURI) {
     options.fileKey = "nva_imagen";
     options.fileName = "imagen_" + new Date().getTime() + ".jpg";
     ft = new FileTransfer();
-    ft.upload(imageURI, _url_photo + "conversacionId=" + currentChat + "&id=" + new Date().getTime() + "&email=" + encodeURIComponent(currentUser.email), uploadImagenSuccessFT, uploadImagenFail, options);
+    ft.upload(imageURI, _url_photo + "conversacionId=" + currentChat + "&id=" + new Date().getTime() + "&idToken=" + currentUser.idToken, uploadImagenSuccessFT, uploadImagenFail, options);
 }
 
 function captureImagenFail(imageURI) {
@@ -828,7 +825,7 @@ function deleteConversacion() {
     myApp.confirm('Esta seguro de eliminar la conversaci&oacute;n?', '', function () {
         myApp.showPreloader('Eliminado conversaci&oacute;n...');
         $.ajax({
-            url: _url_conversacion + "cmd=delete&email=" + currentUser.email + "&id=" + currentChat,
+            url: _url_conversacion + "cmd=delete&idToken=" + currentUser.idToken + "&id=" + currentChat,
             type: 'GET',
             dataType: 'json',
             success: function (response) {
