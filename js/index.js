@@ -333,7 +333,10 @@ function hideAll() {
 
 function slogin() {
     if (isPhoneGapExclusive()) {
-        window.plugins.googleplus.trySilentLogin({},
+        window.plugins.googleplus.trySilentLogin({
+                    'webClientId': "394219421908-hsc5q45ah24ppo7i2bhhga2cc1k3nncb.apps.googleusercontent.com",
+                    offline: true
+                },
                 function (obj) {
                     myApp.showPreloader('Iniciando sesi&oacute;n');
                     obj.registrationId = registrationData;
