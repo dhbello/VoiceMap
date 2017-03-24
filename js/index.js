@@ -18,6 +18,7 @@ var glPoint2;
 var glPointG;
 
 var _Map;
+var _Basemaps;
 var _ArcGISTiledMapServiceLayer;
 var _GraphicsLayer;
 var _PictureMarkerSymbol;
@@ -39,7 +40,7 @@ var currentUser;
 var currentChats;
 var currentChat;
 
-var registrationData;
+var registrationData = null;
 var cachePath;
 var cacheParticipantes;
 
@@ -104,12 +105,12 @@ function init() {
             });
 
             push.on('error', function (e) {
-                alert(JSON.stringify(e));
+                //alert(JSON.stringify(e));
                 // e.message
             });
 
         } catch (err) {
-            alert(err);
+            //alert(err);
         }
     } else {
         gapi.signin2.render('my-signin2', {
@@ -130,6 +131,7 @@ function initMap() {
         require(
             [
                 "esri/map",
+                "esri/basemaps",
                 "esri/layers/ArcGISTiledMapServiceLayer",
                 "esri/layers/GraphicsLayer",
                 "esri/symbols/PictureMarkerSymbol",
@@ -143,6 +145,7 @@ function initMap() {
                 "hammer"
             ], function (
                 __Map,
+                __Basemaps,
                 __ArcGISTiledMapServiceLayer,
                 __GraphicsLayer,
                 __PictureMarkerSymbol,
@@ -155,6 +158,7 @@ function initMap() {
                 __webMercatorUtils,
                 __Hammer) {
                 _Map = __Map;
+                _Basemaps = __Basemaps;
                 _ArcGISTiledMapServiceLayer = __ArcGISTiledMapServiceLayer;
                 _GraphicsLayer = __GraphicsLayer;
                 _PictureMarkerSymbol = __PictureMarkerSymbol;
@@ -174,17 +178,30 @@ function initMap() {
 }
 
 function initMap2() {
+    _Basemaps.myBasemap = {
+        baseMapLayers: [
+          {
+              url: "http://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer"
+          },
+          {
+              url: "http://serviciosgis.eastus.cloudapp.azure.com/arcgis/rest/services/Mapa_Referencia/mapa_base_3857/MapServer"
+          }          
+        ],
+        title: "My Basemap"
+    };
     map = new _Map("map", {
         zoom: 14,
         center: new _Point(-74.0668084, 4.600885262127369),
         autoresize: false,
-        slider: false
+        slider: false,
+        basemap: "myBasemap"
     });
     mapDetalle = new _Map("mapDetalle", {
         zoom: 14,
         center: new _Point(-74.0668084, 4.600885262127369),
         autoresize: false,
-        slider: false
+        slider: false,
+        basemap: "myBasemap"
     });
     mapDetalle.on("update-end", function (evt) {
         if (currentPointChat != null) {
@@ -221,15 +238,15 @@ function initMap2() {
     markerG.setWidth(28);
     markerG.setUrl("css/Marker_Icon.png");
 
-    mapLayer = new _ArcGISTiledMapServiceLayer(baseMapUrl);
-    map.addLayer(mapLayer);
+    //mapLayer = new _ArcGISTiledMapServiceLayer(baseMapUrl);
+    //map.addLayer(mapLayer);
     glPoint = new _GraphicsLayer();
     map.addLayer(glPoint, 0);
     glPointG = new _GraphicsLayer();
     map.addLayer(glPointG, 0);
 
-    mapLayer2 = new _ArcGISTiledMapServiceLayer(baseMapUrl);
-    mapDetalle.addLayer(mapLayer2);
+    //mapLayer2 = new _ArcGISTiledMapServiceLayer(baseMapUrl);
+    //mapDetalle.addLayer(mapLayer2);
     glPoint2 = new _GraphicsLayer();
     mapDetalle.addLayer(glPoint2, 0);
 

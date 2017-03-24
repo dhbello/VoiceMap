@@ -19,7 +19,7 @@
     <meta name="msapplication-tap-highlight" content="no">
     <meta name="google-signin-scope" content="profile email">
     <meta name="google-signin-client_id" content="394219421908-hsc5q45ah24ppo7i2bhhga2cc1k3nncb.apps.googleusercontent.com">
-    <!--<script src="https://apis.google.com/js/platform.js" async defer></script>-->
+    <!--<script src="https://apis.google.com/js/platform.js"></script>-->
     <title>VoiceMap</title>
     <link rel="stylesheet" href="lib/framework7/css/framework7.material.min.css">
     <link rel="stylesheet" href="lib/framework7/css/framework7.material.colors.min.css">
@@ -94,7 +94,7 @@
                     </div>
                 </div>
             </div>
-            <div id="chat-toolbar2" class="toolbar toolbar-bottom">
+            <div id="chat-toolbar2" class="toolbar toolbar-bottom" style="display: none;">
                 <div class="toolbar-inner" style="border: 1px solid gray;background-color: #004167;">
                     <textarea id="txtMsg" style="width: 100%;"></textarea>
                     <a id="btnSendText" href="#" onclick="sendText();" class="link" style="background-color: #004167;"><i class="fa fa-paper-plane" aria-hidden="true"></i></a>
