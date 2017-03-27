@@ -7,9 +7,6 @@ var devicePlatform;
 var map;
 var mapDetalle;
 
-var mapLayer;
-var mapLayer2;
-
 var marker;
 var markerG;
 
@@ -238,15 +235,11 @@ function initMap2() {
     markerG.setWidth(28);
     markerG.setUrl("css/Marker_Icon.png");
 
-    //mapLayer = new _ArcGISTiledMapServiceLayer(baseMapUrl);
-    //map.addLayer(mapLayer);
     glPoint = new _GraphicsLayer();
     map.addLayer(glPoint, 0);
     glPointG = new _GraphicsLayer();
     map.addLayer(glPointG, 0);
 
-    //mapLayer2 = new _ArcGISTiledMapServiceLayer(baseMapUrl);
-    //mapDetalle.addLayer(mapLayer2);
     glPoint2 = new _GraphicsLayer();
     mapDetalle.addLayer(glPoint2, 0);
 
@@ -283,8 +276,8 @@ function updateSize() {
     var the_height = window.innerHeight - $("#header").height();
     $("#map").height(the_height);
     if (map) {
-        map.resize();
-        map.reposition();
+        //map.resize();
+        //map.reposition();
     };
 };
 
@@ -379,7 +372,7 @@ function slogin() {
                     });
                 },
                 function (msg) {
-                    myApp.hidePreloader();
+                    login();
                 }
              );
     };
@@ -426,6 +419,7 @@ function login() {
 };
 
 function onLoginSuccess(googleUser) {
+    myApp.showPreloader('Iniciando sesi&oacute;n');
     console.log('Logged in as: ' + googleUser.getBasicProfile().getName());
     currentUser = { email: googleUser.getBasicProfile().getEmail(), idToken: googleUser.getAuthResponse().id_token, registrationId: null }
     var registroURL = _url_registro + "idToken=" + currentUser.idToken + "&registrationId=" + currentUser.registrationId;
