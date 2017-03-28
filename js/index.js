@@ -345,8 +345,7 @@ function hideAll() {
 function slogin() {
     if (isPhoneGapExclusive()) {
         window.plugins.googleplus.trySilentLogin({
-                    'webClientId': "394219421908-hsc5q45ah24ppo7i2bhhga2cc1k3nncb.apps.googleusercontent.com",
-                    offline: true
+                    'webClientId': "394219421908-hsc5q45ah24ppo7i2bhhga2cc1k3nncb.apps.googleusercontent.com"
                 },
                 function (obj) {
                     try {
@@ -390,8 +389,7 @@ function login() {
     myApp.showPreloader('Iniciando sesi&oacute;n');
     if (isPhoneGapExclusive()) {
         window.plugins.googleplus.login({
-                    'webClientId': "394219421908-hsc5q45ah24ppo7i2bhhga2cc1k3nncb.apps.googleusercontent.com",
-                    offline: true
+                    'webClientId': "394219421908-hsc5q45ah24ppo7i2bhhga2cc1k3nncb.apps.googleusercontent.com"
                 },
                 function (obj) {
                     try {

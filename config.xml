@@ -80,7 +80,7 @@
     <variable name="SENDER_ID" value="394219421908" />
   </plugin>
   <plugin name="cordova-plugin-googleplus" source="npm">
-    <variable name="REVERSED_CLIENT_ID" value="com.googleusercontent.apps.394219421908-hsc5q45ah24ppo7i2bhhga2cc1k3nncb" />
+    <variable name="REVERSED_CLIENT_ID" value="com.googleusercontent.apps.394219421908-7mibib5rap3b831nchjvv4b4em9kir9s" />
   </plugin>
   
   <!-- Third party plugins -->
