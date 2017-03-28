@@ -89,7 +89,6 @@ function init() {
 
             push.on('registration', function (data) {
                 registrationData = devicePlatform + ":" + data.registrationId;
-                slogin();
             });
 
             push.on('notification', function (data) {
@@ -105,6 +104,8 @@ function init() {
                 //alert(JSON.stringify(e));
                 // e.message
             });
+
+            slogin();
 
         } catch (err) {
             //alert(err);
@@ -348,28 +349,35 @@ function slogin() {
                     offline: true
                 },
                 function (obj) {
-                    myApp.showPreloader('Iniciando sesi&oacute;n');
-                    obj.registrationId = registrationData;
-                    currentUser = obj;
-                    var registroURL = _url_registro + "idToken=" + currentUser.idToken + "&registrationId=" + encodeURIComponent(currentUser.registrationId);
-                    $.ajax({
-                        url: registroURL,
-                        type: 'GET',
-                        dataType: 'json',
-                        success: function (response) {
-                            initMap();
-                            myApp.hidePreloader();
-                            currentChats = response.conversaciones;
-                            hideAll();
-                            gotoMap();
-                        },
-                        error: function () {
-                            myApp.hidePreloader();
-                            setTimeout(function () {
-                                sendAlert("Error en el inicio de session.");
-                            }, 1500);
-                        }
-                    });
+                    try {
+                        myApp.showPreloader('Iniciando sesi&oacute;n');
+                        obj.registrationId = registrationData;
+                        currentUser = obj;
+                        var registroURL = _url_registro + "idToken=" + currentUser.idToken + "&registrationId=" + encodeURIComponent(currentUser.registrationId);
+                        $.ajax({
+                            url: registroURL,
+                            type: 'GET',
+                            dataType: 'json',
+                            success: function (response) {
+                                initMap();
+                                myApp.hidePreloader();
+                                currentChats = response.conversaciones;
+                                hideAll();
+                                gotoMap();
+                            },
+                            error: function () {
+                                myApp.hidePreloader();
+                                setTimeout(function () {
+                                    sendAlert("Error en el inicio de session (100).");
+                                }, 1500);
+                            }
+                        });
+                    } catch (err) {
+                        myApp.hidePreloader();
+                        setTimeout(function () {
+                            sendAlert("Error en el inicio de session (500).");
+                        }, 1500);
+                    }                    
                 },
                 function (msg) {
                     login();
@@ -386,32 +394,39 @@ function login() {
                     offline: true
                 },
                 function (obj) {
-                    obj.registrationId = registrationData;
-                    currentUser = obj;
-                    var registroURL = _url_registro + "idToken=" + currentUser.idToken + "&registrationId=" + encodeURIComponent(currentUser.registrationId);
-                    $.ajax({
-                        url: registroURL,
-                        type: 'GET',
-                        dataType: 'json',
-                        success: function (response) {
-                            initMap();
-                            myApp.hidePreloader();
-                            currentChats = response.conversaciones;
-                            hideAll();
-                            gotoMap();
-                        },
-                        error: function () {
-                            myApp.hidePreloader();
-                            setTimeout(function () {
-                                sendAlert("Error en el inicio de session.");
-                            }, 1500);
-                        }
-                    });
+                    try {
+                        obj.registrationId = registrationData;
+                        currentUser = obj;
+                        var registroURL = _url_registro + "idToken=" + currentUser.idToken + "&registrationId=" + encodeURIComponent(currentUser.registrationId);
+                        $.ajax({
+                            url: registroURL,
+                            type: 'GET',
+                            dataType: 'json',
+                            success: function (response) {
+                                initMap();
+                                myApp.hidePreloader();
+                                currentChats = response.conversaciones;
+                                hideAll();
+                                gotoMap();
+                            },
+                            error: function () {
+                                myApp.hidePreloader();
+                                setTimeout(function () {
+                                    sendAlert("Error en el inicio de session (200).");
+                                }, 1500);
+                            }
+                        });
+                    } catch (err) {
+                        myApp.hidePreloader();
+                        setTimeout(function () {
+                            sendAlert("Error en el inicio de session (400).");
+                        }, 1500);
+                    }                   
                 },
                 function (msg) {
                     myApp.hidePreloader();
                     setTimeout(function () {
-                        sendAlert("Error en el inicio de session.");
+                        sendAlert("Error en el inicio de session (300).");
                     }, 1500);
                 });
 
