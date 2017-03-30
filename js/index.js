@@ -44,7 +44,7 @@ var cacheParticipantes;
 var photoURLS = new Array();
 var msgtitle = "VoiceMap";
 var baseMapUrl = "http://serviciosgis.eastus.cloudapp.azure.com/arcgis/rest/services/Mapa_Referencia/mapa_base_3857/MapServer";
-
+var opts = {};
 var _url_registro = 'https://voicemap-153216.appspot.com/Registro?';
 var _url_conversacion = 'https://voicemap-153216.appspot.com/Conversacion?';
 var _url_mensajes = 'https://voicemap-153216.appspot.com/Mensaje?';
@@ -71,6 +71,14 @@ function onDeviceReady() {
 function init() {
     if (isPhoneGapExclusive()) {
         devicePlatform = device.platform;
+        if (devicePlatform == "iOS"){
+            opts = {};
+        };
+        if (devicePlatform == "Android") {
+            opts = {
+                'webClientId': "394219421908-hsc5q45ah24ppo7i2bhhga2cc1k3nncb.apps.googleusercontent.com"
+            };
+        };
         try {
             if ((navigator.connection.type == 0) || (navigator.connection.type == 'none')) {
                 sendAlert('Esta aplicaci&oacute;n requiere conexi&oacute;n a internet.');
@@ -344,9 +352,7 @@ function hideAll() {
 
 function slogin() {
     if (isPhoneGapExclusive()) {
-        window.plugins.googleplus.trySilentLogin({
-                    'webClientId': "394219421908-hsc5q45ah24ppo7i2bhhga2cc1k3nncb.apps.googleusercontent.com"
-                },
+        window.plugins.googleplus.trySilentLogin(opts,
                 function (obj) {
                     try {
                         myApp.showPreloader('Iniciando sesi&oacute;n');
@@ -388,9 +394,7 @@ function slogin() {
 function login() {
     myApp.showPreloader('Iniciando sesi&oacute;n');
     if (isPhoneGapExclusive()) {
-        window.plugins.googleplus.login({
-                    'webClientId': "394219421908-hsc5q45ah24ppo7i2bhhga2cc1k3nncb.apps.googleusercontent.com"
-                },
+        window.plugins.googleplus.login(opts,
                 function (obj) {
                     try {
                         obj.registrationId = registrationData;
@@ -424,7 +428,7 @@ function login() {
                 function (msg) {
                     myApp.hidePreloader();
                     setTimeout(function () {
-                        sendAlert("Error en el inicio de session (300).");
+                        sendAlert("Error en el inicio de session (300)." + msg);
                     }, 1500);
                 });
 
