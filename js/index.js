@@ -344,10 +344,10 @@ function hideAll() {
     $("#listado-toolbar").hide();
     $("#chatDiv").hide();
     $("#chat-toolbar").hide();
+    $("#chat-toolbar2").hide();
     $("#settingsDiv").hide();
     $("#settings-toolbar").hide();
 
-    myApp.hideToolbar(".toolbar");
 };
 
 function slogin() {
@@ -613,6 +613,7 @@ function gotoChat(id) {
     hideAll();
     $("#chatDiv").show();
     $("#chat-toolbar").show();
+    $("#chat-toolbar2").show();
     if (isPhoneGapExclusive()) {
         $("#btnSendPhoto").show();
         $("#btnSendAudio").show();
@@ -620,7 +621,6 @@ function gotoChat(id) {
         $("#btnSendPhoto").hide();
         $("#btnSendAudio").hide();
     }
-    myApp.showToolbar(".toolbar");
 }
 
 function sendText() {
