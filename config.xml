@@ -142,7 +142,7 @@
   </platform>
   
   <config-file platform="ios" parent="CFBundleShortVersionString">
-    <string>81</string>
+    <string>82</string>
   </config-file>
 
   <!--
