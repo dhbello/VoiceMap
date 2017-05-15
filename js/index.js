@@ -43,7 +43,7 @@ var cacheParticipantes;
 
 var photoURLS = new Array();
 var msgtitle = "VoiceMap";
-var baseMapUrl = "http://serviciosgis.eastus.cloudapp.azure.com/arcgis/rest/services/Mapa_Referencia/mapa_base_3857/MapServer";
+var baseMapUrl = "http://serviciosgis.catastrobogota.gov.co/arcgis/rest/services/Mapa_Referencia/mapa_base_3857/MapServer";
 var opts = {};
 var _url_registro = 'https://voicemap-153216.appspot.com/Registro?';
 var _url_conversacion = 'https://voicemap-153216.appspot.com/Conversacion?';
